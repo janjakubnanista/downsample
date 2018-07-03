@@ -8,6 +8,7 @@
     "build": "tsc --declaration src/index.ts --outDir dist",
     "build:watch": "npm run build -- -w",
     "clean": "rm -rf dist",
+    "prepublishOnly": "npm run test && npm run build",
     "test": "mocha --require ts-node/register --watch-extensions js,ts,tsx src/*.spec.ts src/**/*.spec.ts",
     "test:watch": "npm run test -- --watch"
   },
