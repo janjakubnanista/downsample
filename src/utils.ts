@@ -1,12 +1,27 @@
-import { DataPoint, NormalizedDataPoint } from "./types";
+import { DataPoint, NormalizedDataPoint, XYDataPoint, X, TupleDataPoint } from "./types";
+
+const isTupleDataPoint = (dataPoint: DataPoint): dataPoint is TupleDataPoint => {
+  return Array.isArray(dataPoint);
+}
+
+const isXYDataPoint = (dataPoint: DataPoint): dataPoint is XYDataPoint => {
+  return !!dataPoint && "x" in dataPoint && "y" in dataPoint;
+}
+
+const normalizeX = (x: X): number => x instanceof Date ? x.getTime() : x;
 
 export function normalizeDataPoint(dataPoint: DataPoint): NormalizedDataPoint {
   if (!dataPoint) return undefined;
 
-  const x: number = dataPoint.x instanceof Date ? dataPoint.x.getTime() : dataPoint.x;
-  const y: number = dataPoint.y;
+  if (isXYDataPoint(dataPoint)) {
+    return [normalizeX(dataPoint.x), dataPoint.y];
+  }
 
-  return [x, y];
+  if (isTupleDataPoint(dataPoint)) {
+    return [normalizeX(dataPoint[0]), dataPoint[1]];
+  }
+
+  throw new Error(`Invalid data point format supplied: ${JSON.stringify(dataPoint)}`);
 }
 
 export function normalizeDataPoints(dataPoints: DataPoint[]): NormalizedDataPoint[] {
