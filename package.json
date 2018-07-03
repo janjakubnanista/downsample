@@ -1,0 +1,43 @@
+{
+  "name": "downsample",
+  "version": "1.0.0",
+  "description": "Provides functions for time series data downsampling for visual representation",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "test": "mocha --require ts-node/register --watch-extensions js,ts,tsx src/*.spec.ts src/**/*.spec.ts",
+    "test:watch": "npm run test -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janjakubnanista/downsample.git"
+  },
+  "keywords": [
+    "downsample",
+    "data",
+    "downsampling",
+    "charts",
+    "charting",
+    "plot",
+    "plotting"
+  ],
+  "author": "Jan Jakub Nanista <jan.jakub.nanista@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/janjakubnanista/downsample/issues"
+  },
+  "homepage": "https://github.com/janjakubnanista/downsample#readme",
+  "devDependencies": {
+    "@types/expect.js": "^0.3.29",
+    "@types/mocha": "^5.2.4",
+    "@types/node": "^10.5.1",
+    "babel-eslint": "^8.2.5",
+    "eslint": "^5.0.1",
+    "expect.js": "^0.3.1",
+    "gh-pages": "^1.2.0",
+    "mocha": "^5.2.0",
+    "ts-node": "^7.0.0",
+    "typescript": "^2.9.2"
+  }
+}
