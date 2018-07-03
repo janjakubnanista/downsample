@@ -2,9 +2,10 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
+    "declaration": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "sourceMap": true
+    "moduleResolution": "node"
   },
   "files": [
     "./node_modules/@types/mocha/index.d.ts",
