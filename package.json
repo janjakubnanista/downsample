@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "Provides functions for time series data downsampling for visual representation",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --declaration src/index.ts --outDir dist",
     "build:watch": "npm run build -- -w",
+    "clean": "rm -rf dist",
     "test": "mocha --require ts-node/register --watch-extensions js,ts,tsx src/*.spec.ts src/**/*.spec.ts",
     "test:watch": "npm run test -- --watch"
   },
