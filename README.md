@@ -21,7 +21,7 @@ Two downsampling methods are currently supported, description of both can be fou
 
 Downsampling a series of data points using either of these looks like this:
 
-```
+```typescript
 // ES6
 import { LTOB, LTTB } from "downsample";
 
@@ -30,11 +30,11 @@ var LTOB = require("downsample").LTOB;
 var LTTB = require("downsample").LTTB;
 
 // The number of target data points, 100 for example
-const numPointsInDownsampledData = 100;
+const numPointsInDownsampledData: number = 100;
 
 // See the API docs for supported input data formats
-const data = [ ... ];
-const downsampledDataLTOB = LTOB(data, numPointsInDownsampledData);
+const data: DataPoint[] = [ ... ];
+const downsampledDataLTOB: DataPoint[] = LTOB(data, numPointsInDownsampledData);
 
 // downsampledDataLTOB now contains data downsampled to contain 
 // no more than numPointsInDownsampledData data points.
@@ -45,4 +45,46 @@ const downsampledDataLTOB = LTOB(data, numPointsInDownsampledData);
 
 ## API
 
-*Work in progress, please see src/methods/LTOB.ts for a simple TypeScript API*
+### DataPoint type
+
+Represents a data point in the input data array. Two formats are currently supported:
+
+`TupleDataPoint` is an array tuple of a `number` or a `Date` representing 
+the independent variable (e.g. time) and a `number` representing the value:
+
+```typescript
+const numericTupleDataPoint: TupleDataPoint = [1, 152.2];
+
+const dateTupleDataPoint: TupleDataPoint = [new Date(), 45.1];
+```
+
+`XYDataPoint` is an object hash with `x` property representing 
+the independent variable (e.g. time) and an `y` property the value:
+
+```typescript
+const numericXYDataPoint: XYDataPoint = { x: 1, y: 152.2 };
+
+const dateXYDataPoint: XYDataPoint = { x: new Date(), y: 152.2 };
+```
+
+### downsample.LTOB&lt;T extends DataPoint&gt;(data: T[], desiredLength: number): T[]
+
+Implementation of `Largest triangle one bucket` downsampling method.
+
+`data: DataPoint[]` is the input array. This array should be sorted by the independent variable
+otherwise the results will be unpredictable.
+
+`desiredLength: number` is the length of the downsampled array.
+
+This function will throw an error if the `desiredLength` is negative.
+
+### downsample.LTTB&lt;T extends DataPoint&gt;(data: T[], desiredLength: number): T[]
+
+Implementation of `Largest triangle three buckets` downsampling method.
+
+`data: DataPoint[]` is the input array. This array should be sorted by the independent variable
+otherwise the results will be unpredictable.
+
+`desiredLength: number` is the length of the downsampled array.
+
+This function will throw an error if the `desiredLength` is negative.
