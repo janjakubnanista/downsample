@@ -4,6 +4,10 @@ Collection of several downsampling methods for time series visualisation purpose
 
 [![Build Status](https://travis-ci.org/janjakubnanista/downsample.svg?branch=master)](https://travis-ci.org/janjakubnanista/downsample)
 
+## Demo
+
+There is a very minimal interactive demo app available if you want to play around with the results of downsampling. [Check it out here](https://janjakubnanista.github.io/downsample/).
+
 ## Installation
 
 [downsample](https://www.npmjs.com/package/downsample) is an NPM module. Install using
