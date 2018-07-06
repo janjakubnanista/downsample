@@ -3,6 +3,10 @@ logs
 *.log
 npm-debug.log*
 
+# Build artefacts
+dist/
+demo/dist
+
 # Runtime data
 pids
 *.pid
