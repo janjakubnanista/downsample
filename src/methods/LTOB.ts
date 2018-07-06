@@ -16,12 +16,12 @@ export default function LTOB<T extends DataPoint>(data: T[], desiredLength: numb
   //
   // - length is [2, Infinity)
   // - threshold is (length, Inifnity)
-  const bucketSize: number = Math.ceil(length / desiredLength);
+  const bucketSize: number = length / desiredLength;
   const normalizedData: NormalizedDataPoint[] = normalizeDataPoints(data);
   const sampledData: T[] = [data[0]];
 
   for (let bucket: number = 1; bucket < desiredLength - 1; bucket++) {
-    const startIndex: number = bucket * bucketSize;
+    const startIndex: number = Math.floor(bucket * bucketSize);
     const endIndex: number = Math.min(length - 1, (bucket + 1) * bucketSize);
 
     let maxArea = -1;
