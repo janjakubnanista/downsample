@@ -8,7 +8,12 @@
     "build": "tsc --declaration src/index.ts --outDir dist",
     "build:watch": "npm run build -- -w",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run test && npm run build",
+    "demo:build": "webpack --config webpack.demo.config.js --mode production",
+    "demo:clean": "rm -rf demo/dist",
+    "demo:upload": "gh-pages -d demo/dist",
+    "demo:watch": "webpack-dev-server --config webpack.demo.config.js --mode development",
+    "demo:publish": "npm run demo:clean && npm run demo:build && npm run demo:upload",
+    "prepack": "npm run test && npm run build && npm run demo:publish",
     "test": "mocha --require ts-node/register --watch-extensions js,ts,tsx src/*.spec.ts src/**/*.spec.ts",
     "test:watch": "npm run test -- --watch"
   },
@@ -32,15 +37,35 @@
   },
   "homepage": "https://github.com/janjakubnanista/downsample",
   "devDependencies": {
+    "@material-ui/core": "^1.3.1",
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.4",
     "@types/node": "^10.5.1",
+    "@types/react": "^16.4.6",
+    "@types/react-dom": "^16.0.6",
+    "awesome-typescript-loader": "^5.2.0",
+    "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.5",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
     "eslint": "^5.0.1",
     "expect.js": "^0.3.1",
     "gh-pages": "^1.2.0",
+    "html-webpack-plugin": "^3.2.0",
     "mocha": "^5.2.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
-    "typescript": "^2.9.2"
+    "typescript": "^2.9.2",
+    "webpack": "^4.15.0",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4"
+  },
+  "dependencies": {
+    "@material-ui/lab": "^1.0.0-alpha.5",
+    "@types/recharts": "^1.0.23",
+    "recharts": "^1.0.1"
   }
 }
