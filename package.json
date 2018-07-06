@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/janjakubnanista/downsample.git"
+    "url": "https://github.com/janjakubnanista/downsample.git"
   },
   "keywords": [
     "downsample",
@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/janjakubnanista/downsample/issues"
   },
-  "homepage": "https://github.com/janjakubnanista/downsample#readme",
+  "homepage": "https://github.com/janjakubnanista/downsample",
   "devDependencies": {
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.4",
