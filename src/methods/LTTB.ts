@@ -1,5 +1,39 @@
 import { DataPoint, NormalizedDataPoint } from "../types";
-import { normalizeDataPoints, calculateTriangleArea, calculateAverageDataPoint } from "../utils";
+import { normalizeDataPoints, calculateTriangleArea, calculateAverageDataPoint, splitIntoBuckets } from "../utils";
+
+export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[] {
+  const bucketCount: number = buckets.length;
+  const bucketDataPointIndexes: number[] = [0];
+
+  let previousBucketsSize: number = 1;
+  let lastSelectedDataPoint: NormalizedDataPoint = buckets[0][0];
+  for (let index: number = 1; index < bucketCount - 1; index++) {
+    const bucket: NormalizedDataPoint[] = buckets[index];
+    const nextBucket: NormalizedDataPoint[] = buckets[index + 1];
+    const averageDataPointFromNextBucket = calculateAverageDataPoint(...nextBucket);
+
+    let maxArea = -1;
+    let maxAreaIndex = -1;
+    for (let j: number = 0; j < bucket.length; j++) {
+      const dataPoint: NormalizedDataPoint = bucket[j];
+      const area = calculateTriangleArea(lastSelectedDataPoint, dataPoint, averageDataPointFromNextBucket);
+
+      if (area > maxArea) {
+        maxArea = area;
+        maxAreaIndex = j;
+      }
+    }
+
+    lastSelectedDataPoint = bucket[maxAreaIndex];
+    bucketDataPointIndexes.push(previousBucketsSize + maxAreaIndex);
+
+    previousBucketsSize += bucket.length;
+  }
+
+  bucketDataPointIndexes.push(previousBucketsSize);
+
+  return bucketDataPointIndexes;
+}
 
 // Largest triangle three buckets data downsampling algorithm implementation
 export default function LTTB<T extends DataPoint>(data: T[], desiredLength: number): T[] {
@@ -12,40 +46,10 @@ export default function LTTB<T extends DataPoint>(data: T[], desiredLength: numb
     return data;
   }
 
-  // Now we are sure that:
-  //
-  // - length is [2, Infinity)
-  // - threshold is (length, Inifnity)
-  const bucketSize: number = length / desiredLength;
   const normalizedData: NormalizedDataPoint[] = normalizeDataPoints(data);
-  const sampledData: T[] = [data[0]];
+  const buckets: NormalizedDataPoint[][] = splitIntoBuckets(normalizedData, desiredLength);
+  const bucketDataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
+  const dataPoints: T[] = bucketDataPointIndexes.map<T>((index: number) => data[index]);
 
-  let lastSelectedDataPoint: NormalizedDataPoint = normalizedData[0];
-  for (let bucket: number = 1; bucket < desiredLength - 1; bucket++) {
-    const bucketStartIndex = Math.floor(bucket * bucketSize);
-    const nextBucketStartIndex: number = Math.min(length - 1, (bucket + 1) * bucketSize);
-    const nextBucketEndIndex: number = Math.min(length - 1, (bucket + 2) * bucketSize) + 1;
-    const dataPointsInNextBucket: NormalizedDataPoint[] = normalizedData.slice(nextBucketStartIndex, nextBucketEndIndex);
-    const averageDataPointFromNextBucket = calculateAverageDataPoint(...dataPointsInNextBucket);
-
-    let maxArea = -1;
-    let maxAreaIndex = -1;
-    for (let j: number = bucketStartIndex; j < nextBucketStartIndex; j++) {
-      const dataPoint: NormalizedDataPoint = normalizedData[j];
-      const area = calculateTriangleArea(lastSelectedDataPoint, dataPoint, averageDataPointFromNextBucket);
-
-      if (area > maxArea) {
-        maxArea = area;
-        maxAreaIndex = j;
-      }
-    }
-
-    lastSelectedDataPoint = normalizedData[maxAreaIndex];
-
-    sampledData.push(data[maxAreaIndex]);
-  }
-
-  sampledData.push(data[length - 1]);
-
-  return sampledData;
+  return dataPoints;
 }
