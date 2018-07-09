@@ -1,13 +1,25 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, CssBaseline } from "@material-ui/core";
+import { AppBar, Toolbar, Typography, CssBaseline, withStyles } from "@material-ui/core";
 import { generateRandomData } from "../utils";
 import Header from "./Header";
-import { DataPoint, XYDataPoint } from "../../../../src/types";
+import { XYDataPoint } from "../../../../src/types";
 import Chart from "./Chart";
+import { DownsamplingMethod } from "../../types";
 
-export interface AppProps {}
+const style = theme => ({
+  chart: {
+    padding: theme.spacing.unit * 2
+  }
+});
+
+export interface AppProps {
+  classes: {
+    chart: string
+  }
+}
 
 export interface AppState {
+  activeDownsamplingMethods: DownsamplingMethod[];
   data: XYDataPoint[];
   numRawDataPoints: number;
   numConfirmedRawDataPoints: number;
@@ -15,11 +27,12 @@ export interface AppState {
   numConfirmedDownsampledDataPoints: number;
 }
 
-export default class App extends React.Component<AppProps, AppState> {
+class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
 
     this.state = {
+      activeDownsamplingMethods: [DownsamplingMethod.LTD, DownsamplingMethod.LTOB, DownsamplingMethod.LTTB],
       numRawDataPoints: 1000,
       numConfirmedRawDataPoints: 1000,
       numDownsampledDataPoints: 100,
@@ -28,11 +41,9 @@ export default class App extends React.Component<AppProps, AppState> {
     };
   }
 
-  private onNumRawDataPointsChange = (numRawDataPoints: number): void => {
+  private onActiveDownsamplingMethodsChange = (activeDownsamplingMethods: DownsamplingMethod[]) => this.setState({ activeDownsamplingMethods })
 
-
-    this.setState(() => ({ numRawDataPoints }));
-  }
+  private onNumRawDataPointsChange = (numRawDataPoints: number): void => this.setState(() => ({ numRawDataPoints }))
 
   private onNumRawDataPointsConfirm = (): void => {
     const numConfirmedRawDataPoints = this.state.numRawDataPoints;
@@ -64,8 +75,16 @@ export default class App extends React.Component<AppProps, AppState> {
           onNumRawDataPointsConfirm={this.onNumRawDataPointsConfirm}
         />
 
-        <Chart data={this.state.data} numDownsampledDataPoints={this.state.numDownsampledDataPoints}/>
+        <div className={this.props.classes.chart}>
+          <Chart
+            activeDownsamplingMethods={this.state.activeDownsamplingMethods}
+            data={this.state.data}
+            numDownsampledDataPoints={this.state.numDownsampledDataPoints}
+            onActiveDownsamplingMethodsChange={this.onActiveDownsamplingMethodsChange}/>
+        </div>
       </Typography>
     </React.Fragment>;
   }
 }
+
+export default withStyles(style)(App);

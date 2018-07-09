@@ -43,8 +43,8 @@ describe("LTTB", () => {
   it("should downsample correctly", () => {
     expect(LTTB(dateData, 5)).to.be.eql([
       { x: new Date(635554800000), y: 0 },
+      { x: new Date(635554800020), y: 2 },
       { x: new Date(635554800030), y: -2 },
-      { x: new Date(635554800040), y: 10 },
       { x: new Date(635554800070), y: 23 },
       { x: new Date(635554800080), y: 1 }
     ]);

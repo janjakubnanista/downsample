@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from "react";
-import { FormControl, InputLabel, Select, MenuItem, Grid, Paper, withStyles, WithTheme, Typography } from "@material-ui/core";
+import { Grid, withStyles } from "@material-ui/core";
 import Slider from "@material-ui/lab/Slider";
 
 export interface HeaderProps {
