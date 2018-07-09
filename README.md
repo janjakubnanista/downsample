@@ -16,20 +16,27 @@ There is a very minimal interactive demo app available if you want to play aroun
   npm install downsample
 ```
 
+## Acknowledgement
+
+The implementation is based on Sveinn Steinarsson's 2013 paper _Downsampling Time Series for
+Visual Representation_ that can be found [here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf).
+
 ## Usage
 
-Two downsampling methods are currently supported, description of both can be found [here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf):
+Three downsampling methods are currently supported, description of all three can be found [here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf):
 
 - Largest triangle three buckets (LTTB)
 - Largest triangle one bucket (LTOB)
+- Largest triangle dynamic (LTD)
 
 Downsampling a series of data points using either of these looks like this:
 
 ```typescript
 // ES6
-import { LTOB, LTTB } from "downsample";
+import { LTD, LTOB, LTTB } from "downsample";
 
 // Or old school
+var LTD = require("downsample").LTD;
 var LTOB = require("downsample").LTOB;
 var LTTB = require("downsample").LTTB;
 
@@ -85,6 +92,17 @@ This function will throw an error if the `desiredLength` is negative.
 ### downsample.LTTB&lt;T extends DataPoint&gt;(data: T[], desiredLength: number): T[]
 
 Implementation of `Largest triangle three buckets` downsampling method.
+
+`data: DataPoint[]` is the input array. This array should be sorted by the independent variable
+otherwise the results will be unpredictable.
+
+`desiredLength: number` is the length of the downsampled array.
+
+This function will throw an error if the `desiredLength` is negative.
+
+### downsample.LTD&lt;T extends DataPoint&gt;(data: T[], desiredLength: number): T[]
+
+Implementation of `Largest triangle dynamic` downsampling method. Especially good for unevenly sampled data, for evenly spaced data `LTTB` should produce better results.
 
 `data: DataPoint[]` is the input array. This array should be sorted by the independent variable
 otherwise the results will be unpredictable.
