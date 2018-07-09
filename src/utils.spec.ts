@@ -1,7 +1,7 @@
 import "mocha";
 import expect from "expect.js";
 import { NormalizedDataPoint } from "./types";
-import { calculateTriangleArea, calculateAverageDataPoint } from "./utils";
+import { calculateTriangleArea, calculateAverageDataPoint, splitIntoBuckets } from "./utils";
 
 describe("utils", () => {
   describe("calculateTriangleArea", () => {
@@ -53,6 +53,47 @@ describe("utils", () => {
       const pointC: NormalizedDataPoint = [1, -1];
 
       expect(calculateAverageDataPoint(pointA, pointB, pointC)).to.eql([0, 0]);
+    });
+  });
+
+  describe("spliIntoBuckets", () => {
+    const data: [number, number][] = [
+      [0, 2],
+      [1, -1],
+      [2, 2],
+      [3, -1],
+      [4, 2],
+      [5, -1],
+      [6, 2],
+      [7, -1]
+    ];
+
+    it("should return two buckets with one data point each when passed two data points", () => {
+      expect(splitIntoBuckets([
+        [0, 2],
+        [1, -1]
+      ], 2)).to.eql([
+        [
+          [0, 2]
+        ],
+        [
+          [1, -1]
+        ]
+      ]);
+    });
+
+    it("should return an array of desired length", () => {
+      expect(splitIntoBuckets(data, 2)).to.have.length(2);
+      expect(splitIntoBuckets(data, 3)).to.have.length(3);
+      expect(splitIntoBuckets(data, 4)).to.have.length(4);
+      expect(splitIntoBuckets(data, 5)).to.have.length(5);
+    });
+
+    it("should return an array with the first and the last bucket containing the first and the last data points", () => {
+      expect(splitIntoBuckets(data, 3)[0]).to.have.length(1);
+      expect(splitIntoBuckets(data, 3)[0]).to.eql([[0, 2]]);
+      expect(splitIntoBuckets(data, 3)[2]).to.have.length(1);
+      expect(splitIntoBuckets(data, 3)[2]).to.eql([[7, -1]]);
     });
   });
 });

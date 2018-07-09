@@ -45,3 +45,35 @@ export function calculateAverageDataPoint(...points: NormalizedDataPoint[]): Nor
 
   return [averageX / length, averageY / length];
 }
+
+export function splitIntoBuckets<T>(data: T[], desiredLength: number): T[][] {
+  if (data.length === 2) {
+    return [
+      [data[0]],
+      [data[1]]
+    ];
+  }
+
+  const first: T = data[0];
+  const center: T[] = data.slice(1, data.length - 1);
+  const last: T = data[data.length - 1];
+
+  // First and last bucket are formed by the first and the last data points
+  // so we only have N - 2 buckets left to fill
+  const bucketSize: number = center.length / (desiredLength - 2);
+  const splitData: T[][] = [
+    [first]
+  ];
+
+  for (let i: number = 0; i < desiredLength - 2; i++) {
+    const bucketStartIndex: number = Math.floor(i * bucketSize);
+    const bucketEndIndex: number = Math.floor((i + 1) * bucketSize);
+    const dataPointsInBucket: T[] = center.slice(bucketStartIndex, bucketEndIndex);
+
+    splitData.push(dataPointsInBucket);
+  }
+
+  splitData.push([last]);
+
+  return splitData;
+}
