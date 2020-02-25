@@ -14,8 +14,8 @@
     "demo:watch": "webpack-dev-server --config webpack.demo.config.js --mode development",
     "demo:publish": "npm run demo:clean && npm run demo:build && npm run demo:upload",
     "prepack": "npm run test && npm run build && npm run demo:publish",
-    "test": "mocha --require ts-node/register --watch-extensions js,ts,tsx src/*.spec.ts src/**/*.spec.ts",
-    "test:watch": "npm run test -- --watch"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -38,8 +38,7 @@
   "homepage": "https://github.com/janjakubnanista/downsample",
   "devDependencies": {
     "@material-ui/core": "^1.3.1",
-    "@types/expect.js": "^0.3.29",
-    "@types/mocha": "^5.2.4",
+    "@types/jest": "^24.0.18",
     "@types/node": "^10.5.1",
     "@types/react": "^16.4.6",
     "@types/react-dom": "^16.0.6",
@@ -50,12 +49,12 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "eslint": "^5.0.1",
-    "expect.js": "^0.3.1",
     "gh-pages": "^1.2.0",
     "html-webpack-plugin": "^3.2.0",
-    "mocha": "^5.2.0",
+    "jest": "^24.9.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "ts-jest": "^24.1.0",
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
     "typescript": "^2.9.2",

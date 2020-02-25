@@ -1,5 +1,4 @@
-import "mocha";
-import expect from "expect.js";
+import "jest";
 import LTTB from "./LTTB";
 import { DataPoint } from "../types";
 
@@ -17,31 +16,31 @@ describe("LTTB", () => {
   ];
 
   it("should throw an error if desiredLength is negative", () => {
-    expect(() => LTTB(dateData, -1)).to.throwError();
+    expect(() => LTTB(dateData, -1)).toThrow();
   });
 
   it("should return the whole data set if there are two data points", () => {
-    expect(LTTB(dateData.slice(0, 2), 1)).to.have.length(2);
+    expect(LTTB(dateData.slice(0, 2), 1)).toHaveLength(2);
   });
 
   it("should return the whole data set if desiredLength is larger than the data set length", () => {
-    expect(LTTB(dateData, dateData.length + 40)).to.have.length(dateData.length);
+    expect(LTTB(dateData, dateData.length + 40)).toHaveLength(dateData.length);
   });
 
   it("should return desired number of data points", () => {
-    expect(LTTB(dateData, 3)).to.have.length(3);
-    expect(LTTB(dateData, 5)).to.have.length(5);
-    expect(LTTB(dateData, 7)).to.have.length(7);
-    expect(LTTB(dateData, 8)).to.have.length(8);
+    expect(LTTB(dateData, 3)).toHaveLength(3);
+    expect(LTTB(dateData, 5)).toHaveLength(5);
+    expect(LTTB(dateData, 7)).toHaveLength(7);
+    expect(LTTB(dateData, 8)).toHaveLength(8);
   });
 
   it("should preserve the first and last data points", () => {
-    expect(LTTB(dateData, 5)[0]).to.be.eql(dateData[0]);
-    expect(LTTB(dateData, 5)[4]).to.be.eql(dateData[dateData.length - 1]);
+    expect(LTTB(dateData, 5)[0]).toEqual(dateData[0]);
+    expect(LTTB(dateData, 5)[4]).toEqual(dateData[dateData.length - 1]);
   });
 
   it("should downsample correctly", () => {
-    expect(LTTB(dateData, 5)).to.be.eql([
+    expect(LTTB(dateData, 5)).toEqual([
       { x: new Date(635554800000), y: 0 },
       { x: new Date(635554800020), y: 2 },
       { x: new Date(635554800030), y: -2 },
