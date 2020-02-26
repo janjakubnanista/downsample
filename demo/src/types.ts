@@ -1,5 +1,5 @@
 export enum DownsamplingMethod {
-  LTD = "LTD",
-  LTOB = "LTOB",
-  LTTB = "LTTB"
+  LTD = 'LTD',
+  LTOB = 'LTOB',
+  LTTB = 'LTTB',
 }
