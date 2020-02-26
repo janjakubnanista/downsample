@@ -101,9 +101,9 @@ export const calculateSSEForBuckets = (buckets: NormalizedDataPoint[][]): number
   return sse;
 }
 
-export const findLowestSSEAdjacentBucketsIndex = (sse: number[], ignoreIndex: number): number => {
+export const findLowestSSEAdjacentBucketsIndex = (sse: number[], ignoreIndex: number): number | undefined => {
   let minSSESum: number = Number.MAX_VALUE;
-  let minSSEIndex: number = undefined;
+  let minSSEIndex: number | undefined = undefined;
   for (let i: number = 1; i < sse.length - 2; i++) {
     if (i === ignoreIndex  || i + 1 === ignoreIndex) {
       continue;
@@ -118,9 +118,9 @@ export const findLowestSSEAdjacentBucketsIndex = (sse: number[], ignoreIndex: nu
   return minSSEIndex;
 }
 
-export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse: number[]): number => {
+export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse: number[]): number | undefined => {
   let maxSSE: number = 0;
-  let maxSSEIndex: number = undefined;
+  let maxSSEIndex: number | undefined = undefined;
   for (let i: number = 1; i < sse.length - 1; i++) {
     if (buckets[i].length > 1 && sse[i] > maxSSE) {
       maxSSE = sse[i];
@@ -176,14 +176,14 @@ export default function LTD<T extends DataPoint>(data: T[], desiredLength: numbe
     const sseForBuckets: number[] = calculateSSEForBuckets(buckets);
 
     // 4: Find the bucket F with the highest SSE
-    const highestSSEBucketIndex: number = findHighestSSEBucketIndex(buckets, sseForBuckets);
+    const highestSSEBucketIndex: number | undefined = findHighestSSEBucketIndex(buckets, sseForBuckets);
     if (highestSSEBucketIndex === undefined) {
       break;
     }
 
     // 5: Find the pair of adjacent buckets A and B with the lowest SSE sum . The
     // pair should not contain F
-    const lowestSSEAdajacentBucketIndex: number = findLowestSSEAdjacentBucketsIndex(sseForBuckets, highestSSEBucketIndex);
+    const lowestSSEAdajacentBucketIndex: number | undefined = findLowestSSEAdjacentBucketsIndex(sseForBuckets, highestSSEBucketIndex);
     if (lowestSSEAdajacentBucketIndex === undefined) {
       break;
     }
