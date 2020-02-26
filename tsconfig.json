@@ -1,25 +1,38 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
     "allowSyntheticDefaultImports": true,
     "declaration": true,
+    "declarationDir": "dist",
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
-    "outDir": "dist",
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "noEmit": true,
+    "noErrorTruncation": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitThis": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveConstEnums": true,
+    "resolveJsonModule": true,
+    "removeComments": false,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "suppressImplicitAnyIndexErrors": false,
     "moduleResolution": "node",
-    "jsx": "React",
+    "target": "esnext",
+    "module": "commonjs",
+    "jsx": "react",
     "lib": [
-      "dom",
-      "es7"
+      "es2019"
     ]
-  },
-  "files": [
-    "./node_modules/@types/node/index.d.ts"
-  ],
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }

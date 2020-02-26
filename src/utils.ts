@@ -10,7 +10,7 @@ const isXYDataPoint = (dataPoint: DataPoint): dataPoint is XYDataPoint => {
 
 const normalizeX = (x: X): number => x instanceof Date ? x.getTime() : x;
 
-export function normalizeDataPoint(dataPoint: DataPoint): NormalizedDataPoint {
+export function normalizeDataPoint(dataPoint: DataPoint): NormalizedDataPoint | undefined {
   if (!dataPoint) return undefined;
 
   if (isXYDataPoint(dataPoint)) {
@@ -25,14 +25,14 @@ export function normalizeDataPoint(dataPoint: DataPoint): NormalizedDataPoint {
 }
 
 export function normalizeDataPoints(dataPoints: DataPoint[]): NormalizedDataPoint[] {
-  return dataPoints.map(normalizeDataPoint);
+  return dataPoints.map(normalizeDataPoint).filter(Boolean) as NormalizedDataPoint[];
 }
 
 export function calculateTriangleArea(pointA: NormalizedDataPoint, pointB: NormalizedDataPoint, pointC: NormalizedDataPoint): number {
   return Math.abs((pointA[0] - pointC[0]) * (pointB[1] - pointA[1]) - (pointA[0] - pointB[0]) * (pointC[1] - pointA[1])) / 2;
 }
 
-export function calculateAverageDataPoint(...points: NormalizedDataPoint[]): NormalizedDataPoint {
+export function calculateAverageDataPoint(...points: NormalizedDataPoint[]): NormalizedDataPoint | undefined {
   const { length } = points;
   if (!length) return undefined;
 

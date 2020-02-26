@@ -11,6 +11,7 @@ export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[
     const bucket: NormalizedDataPoint[] = buckets[index];
     const nextBucket: NormalizedDataPoint[] = buckets[index + 1];
     const averageDataPointFromNextBucket = calculateAverageDataPoint(...nextBucket);
+    if (averageDataPointFromNextBucket === undefined) continue;
 
     let maxArea = -1;
     let maxAreaIndex = -1;
