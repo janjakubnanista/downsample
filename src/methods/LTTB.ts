@@ -1,13 +1,13 @@
-import { DataPoint, NormalizedDataPoint } from "../types";
-import { normalizeDataPoints, calculateTriangleArea, calculateAverageDataPoint, splitIntoBuckets } from "../utils";
+import { DataPoint, NormalizedDataPoint } from '../types';
+import { calculateAverageDataPoint, calculateTriangleArea, normalizeDataPoints, splitIntoBuckets } from '../utils';
 
 export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[] {
   const bucketCount: number = buckets.length;
   const bucketDataPointIndexes: number[] = [0];
 
-  let previousBucketsSize: number = 1;
+  let previousBucketsSize = 1;
   let lastSelectedDataPoint: NormalizedDataPoint = buckets[0][0];
-  for (let index: number = 1; index < bucketCount - 1; index++) {
+  for (let index = 1; index < bucketCount - 1; index++) {
     const bucket: NormalizedDataPoint[] = buckets[index];
     const nextBucket: NormalizedDataPoint[] = buckets[index + 1];
     const averageDataPointFromNextBucket = calculateAverageDataPoint(...nextBucket);
@@ -15,7 +15,7 @@ export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[
 
     let maxArea = -1;
     let maxAreaIndex = -1;
-    for (let j: number = 0; j < bucket.length; j++) {
+    for (let j = 0; j < bucket.length; j++) {
       const dataPoint: NormalizedDataPoint = bucket[j];
       const area = calculateTriangleArea(lastSelectedDataPoint, dataPoint, averageDataPointFromNextBucket);
 

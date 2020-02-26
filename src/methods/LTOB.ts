@@ -1,5 +1,5 @@
-import { DataPoint, NormalizedDataPoint } from "../types";
-import { normalizeDataPoints, calculateTriangleArea } from "../utils";
+import { DataPoint, NormalizedDataPoint } from '../types';
+import { calculateTriangleArea, normalizeDataPoints } from '../utils';
 
 // Largest triangle three buckets data downsampling algorithm implementation
 export default function LTOB<T extends DataPoint>(data: T[], desiredLength: number): T[] {
@@ -20,7 +20,7 @@ export default function LTOB<T extends DataPoint>(data: T[], desiredLength: numb
   const normalizedData: NormalizedDataPoint[] = normalizeDataPoints(data);
   const sampledData: T[] = [data[0]];
 
-  for (let bucket: number = 1; bucket < desiredLength - 1; bucket++) {
+  for (let bucket = 1; bucket < desiredLength - 1; bucket++) {
     const startIndex: number = Math.floor(bucket * bucketSize);
     const endIndex: number = Math.min(length - 1, (bucket + 1) * bucketSize);
 

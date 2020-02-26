@@ -1,24 +1,24 @@
-import React from "react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
-import { XYDataPoint } from "../../../../src/types";
-import { LTOB, LTTB, LTD } from "../../../../src";
-import { DownsamplingMethod } from "../../types";
+import { DownsamplingMethod } from '../../types';
+import { LTD, LTOB, LTTB } from '../../../../src';
+import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { XYDataPoint } from '../../../../src/types';
+import React from 'react';
 
 const downsamplingMethodFromDataKey = (dataKey: string): DownsamplingMethod => {
   switch (dataKey) {
-    case "ltd":
+    case 'ltd':
       return DownsamplingMethod.LTD;
 
-    case "ltob":
+    case 'ltob':
       return DownsamplingMethod.LTOB;
 
-    case "lttb":
+    case 'lttb':
       return DownsamplingMethod.LTTB;
 
     default:
       return undefined;
   }
-}
+};
 
 export interface ChartProps {
   activeDownsamplingMethods: DownsamplingMethod[];
@@ -60,7 +60,7 @@ export default class Chart extends React.PureComponent<ChartProps> {
         ltd: dataPointLTD ? dataPointLTD.y : undefined,
         ltob: dataPointLTOB ? dataPointLTOB.y : undefined,
         lttb: dataPointLTTB ? dataPointLTTB.y : undefined,
-      }
+      };
     });
   }
 
@@ -71,44 +71,72 @@ export default class Chart extends React.PureComponent<ChartProps> {
     }
 
     const isDownsamplingMethodActive = this.props.activeDownsamplingMethods.includes(downsamplingMethod);
-    const activeDownsamplingMethods = isDownsamplingMethodActive ?
-      this.props.activeDownsamplingMethods.filter(activeDownsamplingMethod => activeDownsamplingMethod !== downsamplingMethod) :
-      [...this.props.activeDownsamplingMethods, downsamplingMethod];
+    const activeDownsamplingMethods = isDownsamplingMethodActive
+      ? this.props.activeDownsamplingMethods.filter(
+          activeDownsamplingMethod => activeDownsamplingMethod !== downsamplingMethod,
+        )
+      : [...this.props.activeDownsamplingMethods, downsamplingMethod];
 
     this.props.onActiveDownsamplingMethodsChange(activeDownsamplingMethods);
-  }
+  };
 
   private getColorForDownsamplingMethod(downsamplingMethod: DownsamplingMethod): string {
     if (!this.props.activeDownsamplingMethods.includes(downsamplingMethod)) {
-      return "#CCCCCC";
+      return '#CCCCCC';
     }
 
     switch (downsamplingMethod) {
       case DownsamplingMethod.LTD:
-        return "#FF9C00";
+        return '#FF9C00';
 
       case DownsamplingMethod.LTOB:
-        return "#C20165";
+        return '#C20165';
 
       case DownsamplingMethod.LTTB:
-        return "#00B7D9";
+        return '#00B7D9';
     }
   }
 
   render(): React.ReactNode {
     const data = this.getData();
 
-    return <ResponsiveContainer height="75%">
-      <LineChart data={data} margin={{ top: 20, right: 20, left: 20 }}>
-        <XAxis dataKey="x" />
-        <YAxis />
-        <Legend onClick={this.onLegendItemClick}/>
-        <Tooltip />
-        <Line dot={false} type="linear" dataKey="y" stroke="#061766" isAnimationActive={false} name="Raw data"/>
-        <Line dot={false} type="linear" dataKey="ltob" stroke={this.getColorForDownsamplingMethod(DownsamplingMethod.LTOB)} isAnimationActive={false} connectNulls={true} name="Downsampled with LTOB"/>
-        <Line dot={false} type="linear" dataKey="lttb" stroke={this.getColorForDownsamplingMethod(DownsamplingMethod.LTTB)} isAnimationActive={false} connectNulls={true} name="Downsampled with LTTB"/>
-        <Line dot={false} type="linear" dataKey="ltd" stroke={this.getColorForDownsamplingMethod(DownsamplingMethod.LTD)} isAnimationActive={false} connectNulls={true} name="Downsampled with LTD"/>
-      </LineChart>
-    </ResponsiveContainer>;
+    return (
+      <ResponsiveContainer height="75%">
+        <LineChart data={data} margin={{ top: 20, right: 20, left: 20 }}>
+          <XAxis dataKey="x" />
+          <YAxis />
+          <Legend onClick={this.onLegendItemClick} />
+          <Tooltip />
+          <Line dot={false} type="linear" dataKey="y" stroke="#061766" isAnimationActive={false} name="Raw data" />
+          <Line
+            dot={false}
+            type="linear"
+            dataKey="ltob"
+            stroke={this.getColorForDownsamplingMethod(DownsamplingMethod.LTOB)}
+            isAnimationActive={false}
+            connectNulls={true}
+            name="Downsampled with LTOB"
+          />
+          <Line
+            dot={false}
+            type="linear"
+            dataKey="lttb"
+            stroke={this.getColorForDownsamplingMethod(DownsamplingMethod.LTTB)}
+            isAnimationActive={false}
+            connectNulls={true}
+            name="Downsampled with LTTB"
+          />
+          <Line
+            dot={false}
+            type="linear"
+            dataKey="ltd"
+            stroke={this.getColorForDownsamplingMethod(DownsamplingMethod.LTD)}
+            isAnimationActive={false}
+            connectNulls={true}
+            name="Downsampled with LTD"
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    );
   }
 }

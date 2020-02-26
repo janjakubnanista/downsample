@@ -1,6 +1,6 @@
-import { DataPoint, NormalizedDataPoint } from "../types";
-import { normalizeDataPoints, splitIntoBuckets } from "../utils";
-import { LTTBIndexesForBuckets } from "./LTTB";
+import { DataPoint, NormalizedDataPoint } from '../types';
+import { LTTBIndexesForBuckets } from './LTTB';
+import { normalizeDataPoints, splitIntoBuckets } from '../utils';
 
 export const mergeBucketAt = (buckets: NormalizedDataPoint[][], index: number): NormalizedDataPoint[][] => {
   const bucketA: NormalizedDataPoint[] = buckets[index];
@@ -15,7 +15,7 @@ export const mergeBucketAt = (buckets: NormalizedDataPoint[][], index: number): 
   newBuckets.splice(index, 2, mergedBucket);
 
   return newBuckets;
-}
+};
 
 export const splitBucketAt = (buckets: NormalizedDataPoint[][], index: number): NormalizedDataPoint[][] => {
   const bucket: NormalizedDataPoint[] = buckets[index];
@@ -36,14 +36,14 @@ export const splitBucketAt = (buckets: NormalizedDataPoint[][], index: number): 
   newBuckets.splice(index, 1, bucketA, bucketB);
 
   return newBuckets;
-}
+};
 
 export const calculateLinearRegressionCoefficients = (data: NormalizedDataPoint[]): [number, number] => {
-  const N:number = data.length;
+  const N: number = data.length;
 
-  let averageX: number = 0;
-  let averageY: number = 0;
-  for (let i: number = 0; i < N; i++) {
+  let averageX = 0;
+  let averageY = 0;
+  for (let i = 0; i < N; i++) {
     averageX += data[i][0];
     averageY += data[i][1];
   }
@@ -51,9 +51,9 @@ export const calculateLinearRegressionCoefficients = (data: NormalizedDataPoint[
   averageX /= N;
   averageY /= N;
 
-  let aNumerator: number = 0;
-  let aDenominator: number = 0;
-  for (let i: number = 0; i < N; i++) {
+  let aNumerator = 0;
+  let aDenominator = 0;
+  for (let i = 0; i < N; i++) {
     const [x, y]: NormalizedDataPoint = data[i];
     aNumerator += (x - averageX) * (y - averageY);
     aDenominator += (x - averageX) * (x - averageX);
@@ -63,13 +63,13 @@ export const calculateLinearRegressionCoefficients = (data: NormalizedDataPoint[
   const b: number = averageY - a * averageX;
 
   return [a, b];
-}
+};
 
 export const calculateSSEForBucket = (dataPoints: NormalizedDataPoint[]): number => {
   const [a, b] = calculateLinearRegressionCoefficients(dataPoints);
 
   let sumStandardErrorsSquared = 0;
-  for (let i: number = 0; i < dataPoints.length; i++) {
+  for (let i = 0; i < dataPoints.length; i++) {
     const dataPoint: NormalizedDataPoint = dataPoints[i];
     const standardError: number = dataPoint[1] - (a * dataPoint[0] + b);
 
@@ -77,20 +77,20 @@ export const calculateSSEForBucket = (dataPoints: NormalizedDataPoint[]): number
   }
 
   return sumStandardErrorsSquared;
-}
+};
 
 export const calculateSSEForBuckets = (buckets: NormalizedDataPoint[][]): number[] => {
   // We skip the first and last buckets since they only contain one data point
   const sse: number[] = [0];
 
-  for (let i: number = 1; i < buckets.length - 1; i++) {
+  for (let i = 1; i < buckets.length - 1; i++) {
     const previousBucket: NormalizedDataPoint[] = buckets[i - 1];
     const currentBucket: NormalizedDataPoint[] = buckets[i];
     const nextBucket: NormalizedDataPoint[] = buckets[i + 1];
     const bucketWithAdjacentPoints: NormalizedDataPoint[] = [
       previousBucket[previousBucket.length - 1],
       ...currentBucket,
-      nextBucket[0]
+      nextBucket[0],
     ];
 
     sse.push(calculateSSEForBucket(bucketWithAdjacentPoints));
@@ -99,13 +99,13 @@ export const calculateSSEForBuckets = (buckets: NormalizedDataPoint[][]): number
   sse.push(0);
 
   return sse;
-}
+};
 
 export const findLowestSSEAdjacentBucketsIndex = (sse: number[], ignoreIndex: number): number | undefined => {
   let minSSESum: number = Number.MAX_VALUE;
   let minSSEIndex: number | undefined = undefined;
-  for (let i: number = 1; i < sse.length - 2; i++) {
-    if (i === ignoreIndex  || i + 1 === ignoreIndex) {
+  for (let i = 1; i < sse.length - 2; i++) {
+    if (i === ignoreIndex || i + 1 === ignoreIndex) {
       continue;
     }
 
@@ -116,12 +116,12 @@ export const findLowestSSEAdjacentBucketsIndex = (sse: number[], ignoreIndex: nu
   }
 
   return minSSEIndex;
-}
+};
 
 export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse: number[]): number | undefined => {
-  let maxSSE: number = 0;
+  let maxSSE = 0;
   let maxSSEIndex: number | undefined = undefined;
-  for (let i: number = 1; i < sse.length - 1; i++) {
+  for (let i = 1; i < sse.length - 1; i++) {
     if (buckets[i].length > 1 && sse[i] > maxSSE) {
       maxSSE = sse[i];
       maxSSEIndex = i;
@@ -129,7 +129,7 @@ export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse:
   }
 
   return maxSSEIndex;
-}
+};
 
 // Largest triangle three buckets data downsampling algorithm implementation
 export default function LTD<T extends DataPoint>(data: T[], desiredLength: number): T[] {
@@ -170,7 +170,7 @@ export default function LTD<T extends DataPoint>(data: T[], desiredLength: numbe
 
   let buckets: NormalizedDataPoint[][] = splitIntoBuckets(normalizedData, desiredLength);
   const numIterations = (length * 10) / desiredLength;
-  for (let iteration: number = 0; iteration < numIterations; iteration++) {
+  for (let iteration = 0; iteration < numIterations; iteration++) {
     // 2: Calculate the SSE for the buckets accordingly . With one point in adjacent
     // buckets overlapping
     const sseForBuckets: number[] = calculateSSEForBuckets(buckets);
@@ -183,7 +183,10 @@ export default function LTD<T extends DataPoint>(data: T[], desiredLength: numbe
 
     // 5: Find the pair of adjacent buckets A and B with the lowest SSE sum . The
     // pair should not contain F
-    const lowestSSEAdajacentBucketIndex: number | undefined = findLowestSSEAdjacentBucketsIndex(sseForBuckets, highestSSEBucketIndex);
+    const lowestSSEAdajacentBucketIndex: number | undefined = findLowestSSEAdjacentBucketsIndex(
+      sseForBuckets,
+      highestSSEBucketIndex,
+    );
     if (lowestSSEAdajacentBucketIndex === undefined) {
       break;
     }
@@ -196,7 +199,12 @@ export default function LTD<T extends DataPoint>(data: T[], desiredLength: numbe
     // If the lowest SSE index was after the highest index in the original
     // unsplit array then we need to move it by one up since now the array has one more element
     // before this index
-    buckets = mergeBucketAt(buckets, lowestSSEAdajacentBucketIndex > highestSSEBucketIndex ? lowestSSEAdajacentBucketIndex + 1 : lowestSSEAdajacentBucketIndex);
+    buckets = mergeBucketAt(
+      buckets,
+      lowestSSEAdajacentBucketIndex > highestSSEBucketIndex
+        ? lowestSSEAdajacentBucketIndex + 1
+        : lowestSSEAdajacentBucketIndex,
+    );
   }
 
   const dataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
