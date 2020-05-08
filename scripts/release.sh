@@ -1,25 +1,23 @@
 #!/usr/bin/env bash
 
-OUTDIR=dist
-VERSION=
+DRY_RUN=
+QUIET=
 
 # Get the script arguments
 # 
-# -o|--out-dir              Where to put the build
-# -v|--version <version>    The version to use <UNUSED>
+# -d|--dry-run        Don't publish, just peek
+# -q|--quiet          Suppress user confirmation of publish (has no effect when dry-running)
 while [[ $# -gt 0 ]]; do
   OPTION="$1"
 
   case $OPTION in
-      -o|--out-dir)
-      OUTDIR=1
+      -d|--dry-run)
+      DRY_RUN=1
       shift # past argument
-      shift # past value
       ;;
-      -v|--version)
-      VERSION="$2"
+      -q|--quiet)
+      QUIET=1
       shift # past argument
-      shift # past value
       ;;
   esac
 done
@@ -64,7 +62,14 @@ yarn test
 
 cd ../
 cd "$DIST_PATH"
-npm publish --dry-run
 
-read -p "Press anything to release to NPM"
-npm publish
+if [ -z "$DRY_RUN" ]; then
+  # Ask for confirmation before publishing
+  if [ -z "$QUIET" ]; then
+    read -p "Press anything to release to NPM"
+  fi
+
+  npm publish
+else
+  npm publish --dry-run
+fi
