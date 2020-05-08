@@ -132,7 +132,7 @@ export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse:
 };
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export default function LTD<T extends DataPoint>(data: T[], desiredLength: number): T[] {
+export function LTD<T extends DataPoint>(data: T[], desiredLength: number): T[] {
   if (desiredLength < 0) {
     throw new Error(`Supplied negative desiredLength parameter to LTD: ${desiredLength}`);
   }

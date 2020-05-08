@@ -1,6 +1,6 @@
 import 'jest';
 import { DataPoint } from '../types';
-import LTD from './LTD';
+import { LTD } from './LTD';
 
 describe('LTD', () => {
   const dateData: DataPoint[] = [
