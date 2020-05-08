@@ -94,6 +94,10 @@
       "pre-commit": "lint-staged"
     }
   },
+  "jest": {
+    "preset": "ts-jest",
+    "testPathIgnorePatterns": ["<rootDir>/test", "/node_modules/"]
+  },
   "lint-staged": {
     "*.{js,ts}(x)?": ["eslint --fix", "git add"]
   }
