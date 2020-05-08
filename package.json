@@ -1,10 +1,9 @@
 {
   "name": "downsample",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Provides functions for time series data downsampling for visual representation",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.es.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "rollup -c",
     "build:watch": "rollup -cw",
@@ -14,9 +13,9 @@
     "demo:upload": "gh-pages -d demo/dist",
     "demo:watch": "webpack-dev-server --config webpack.demo.config.js --mode development",
     "demo:publish": "yarn demo:clean && yarn demo:build && yarn demo:upload",
-    "prepack": "yarn test && yarn build && yarn demo:publish",
-    "lint": "eslint ./src ./demo --fix --ext .ts,.tsx,.js,.jsx",
-    "lint:build": "eslint ./dist --fix --ext .d.ts",
+    "release": "./script/release.sh",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "yarn lint --fix",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -38,6 +37,12 @@
   "bugs": {
     "url": "https://github.com/janjakubnanista/downsample/issues"
   },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "**/*.js",
+    "**/*.d.ts"
+  ],
   "homepage": "https://github.com/janjakubnanista/downsample",
   "devDependencies": {
     "@babel/core": "^7.6.2",
@@ -70,11 +75,10 @@
     "prettier": "^1.19.1",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "recharts": "^1.0.1",
-    "rollup": "^1.27.0",
+    "recharts": "^1.8.5",
+    "rollup": "^2.8.2",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-terser": "^5.2.0",
     "ts-jest": "^24.1.0",
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
@@ -88,7 +92,13 @@
       "pre-commit": "lint-staged"
     }
   },
+  "jest": {
+    "preset": "ts-jest",
+    "testPathIgnorePatterns": ["<rootDir>/test", "/node_modules/"]
+  },
   "lint-staged": {
-    "*.{js,ts}(x)?": ["eslint --fix", "git add"]
+    "*.{js,ts}(x)?": [
+      "eslint --fix"
+    ]
   }
 }

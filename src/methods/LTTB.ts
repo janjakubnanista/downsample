@@ -37,7 +37,7 @@ export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[
 }
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export default function LTTB<T extends DataPoint>(data: T[], desiredLength: number): T[] {
+export function LTTB<T extends DataPoint>(data: T[], desiredLength: number): T[] {
   if (desiredLength < 0) {
     throw new Error(`Supplied negative desiredLength parameter to LTTB: ${desiredLength}`);
   }

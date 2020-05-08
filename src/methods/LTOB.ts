@@ -2,7 +2,7 @@ import { DataPoint, NormalizedDataPoint } from '../types';
 import { calculateTriangleArea, normalizeDataPoints } from '../utils';
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export default function LTOB<T extends DataPoint>(data: T[], desiredLength: number): T[] {
+export function LTOB<T extends DataPoint>(data: T[], desiredLength: number): T[] {
   if (desiredLength < 0) {
     throw new Error(`Supplied negative desiredLength parameter to LTOB: ${desiredLength}`);
   }

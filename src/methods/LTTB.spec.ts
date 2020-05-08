@@ -1,6 +1,6 @@
 import 'jest';
 import { DataPoint } from '../types';
-import LTTB from './LTTB';
+import { LTTB } from './LTTB';
 
 describe('LTTB', () => {
   const dateData: DataPoint[] = [

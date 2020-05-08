@@ -32,6 +32,11 @@ module.exports =  {
       // And last but not least require() calls are enabled in js files
       '@typescript-eslint/no-var-requires': 0
     }
+  }, {
+    files: ['test/**.spec.ts'],
+    rules: {
+      '@typescript-eslint/ban-ts-ignore': 1
+    }
   }],
   rules:  {
     // Place to put our Quin-specific rules

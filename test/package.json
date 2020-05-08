@@ -1,0 +1,19 @@
+{
+  "name": "@downsample/test",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "downsample": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "jest": "^26.0.1",
+    "ts-jest": "^25.5.0"
+  },
+  "jest": {
+    "preset": "ts-jest"
+  }
+}

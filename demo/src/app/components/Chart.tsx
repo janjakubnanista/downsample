@@ -16,7 +16,7 @@ const downsamplingMethodFromDataKey = (dataKey: string): DownsamplingMethod => {
       return DownsamplingMethod.LTTB;
 
     default:
-      return undefined;
+      throw new Error('Unknown method: ' + dataKey);
   }
 };
 
