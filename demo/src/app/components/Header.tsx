@@ -1,4 +1,4 @@
-import { Grid, withStyles } from '@material-ui/core';
+import { Grid, Theme, withStyles } from '@material-ui/core';
 import React, { ChangeEvent } from 'react';
 import Slider from '@material-ui/lab/Slider';
 
@@ -13,7 +13,7 @@ export interface HeaderProps {
   onNumDownsampledDataPointsChange: (numDownsampledDataPoints: number) => void;
 }
 
-const style = theme => ({
+const style = (theme: Theme) => ({
   paper: {
     margin: theme.spacing.unit * 2,
     padding: theme.spacing.unit,

@@ -1,4 +1,4 @@
-import { AppBar, CssBaseline, Toolbar, Typography, withStyles } from '@material-ui/core';
+import { AppBar, CssBaseline, Theme, Toolbar, Typography, withStyles } from '@material-ui/core';
 import { DownsamplingMethod } from '../../types';
 import { XYDataPoint } from '../../../../src/types';
 import { generateRandomData } from '../utils';
@@ -6,7 +6,7 @@ import Chart from './Chart';
 import Header from './Header';
 import React from 'react';
 
-const style = theme => ({
+const style = (theme: Theme) => ({
   chart: {
     padding: theme.spacing.unit * 2,
   },
