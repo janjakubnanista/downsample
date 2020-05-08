@@ -38,6 +38,12 @@
   "bugs": {
     "url": "https://github.com/janjakubnanista/downsample/issues"
   },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "**/*.js",
+    "**/*.d.ts"
+  ],
   "homepage": "https://github.com/janjakubnanista/downsample",
   "devDependencies": {
     "@babel/core": "^7.6.2",

@@ -1,8 +1,0 @@
-.eslintrc
-.travis.yml
-tsconfig.json
-webpack.demo.config.js
-
-node_modules/
-demo/
-src/
