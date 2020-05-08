@@ -1,13 +1,38 @@
-# downsample
+<h1 align="center">
+  downsample
+</h1>
 
-Collection of several downsampling methods for time series visualisation purposes.
+<p align="center">
+  Downsampling methods for time series visualisation.
+</p>
 
-[![Build Status](https://travis-ci.org/janjakubnanista/downsample.svg?branch=master)](https://travis-ci.org/janjakubnanista/downsample)
+<!-- The badges section -->
+<p align="center">
+  <!-- Travis CI build status -->
+  <a href="https://travis-ci.org/janjakubnanista/downsample"><img alt="Build Status" src="https://travis-ci.org/janjakubnanista/downsample.svg?branch=master"/></a>
+  <!-- Fury.io NPM published package version -->
+  <a href="https://www.npmjs.com/package/downsample"><img alt="NPM Version" src="https://badge.fury.io/js/downsample.svg"/></a>
+  <!-- Shields.io dev dependencies status -->
+  <a href="https://github.com/janjakubnanista/downsample/blob/master/package.json"><img alt="Dev Dependency Status" src="https://img.shields.io/david/dev/janjakubnanista/downsample"/></a>
+  <!-- Snyk.io vulnerabilities badge -->
+  <a href="https://snyk.io/test/github/janjakubnanista/downsample"><img alt="Known Vulnerabilities" src="https://snyk.io/test/github/janjakubnanista/downsample/badge.svg"/></a>
+  <!-- Shields.io license badge -->
+  <a href="https://github.com/janjakubnanista/downsample/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/npm/l/downsample"/></a>
+</p>
+
+<p align="center">
+  <a href="#installation">Installation</a>
+  <span>|</span>
+  <a href="#usage">Usage</a>
+  <span>|</span>
+  <a href="#api">API</a>
+</p>
 
 ## Demo
 
 There is a very minimal interactive demo app available if you want to play around with the results of downsampling. [Check it out here](https://janjakubnanista.github.io/downsample/).
 
+<a id="installation"></a>
 ## Installation
 
 [downsample](https://www.npmjs.com/package/downsample) is an NPM module. Install using
@@ -16,11 +41,13 @@ There is a very minimal interactive demo app available if you want to play aroun
   npm install downsample
 ```
 
-## Acknowledgement
+Or
 
-The implementation is based on Sveinn Steinarsson's 2013 paper _Downsampling Time Series for
-Visual Representation_ that can be found [here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf).
+```
+  yarn add downsample
+```
 
+<a id="usage"></a>
 ## Usage
 
 Three downsampling methods are currently supported, description of all three can be found [here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf):
@@ -32,8 +59,11 @@ Three downsampling methods are currently supported, description of all three can
 Downsampling a series of data points using either of these looks like this:
 
 ```typescript
-// ES6
+// ES6 import syntax
 import { LTD, LTOB, LTTB } from "downsample";
+
+// You can also only import the bits you want
+import { LTD } from "downsample/methods/LTD";
 
 // Or old school
 var LTD = require("downsample").LTD;
@@ -54,9 +84,10 @@ const downsampledDataLTOB: DataPoint[] = LTOB(data, numPointsInDownsampledData);
 // shallowly to the resulting array
 ```
 
+<a id="api"></a>
 ## API
 
-### DataPoint type
+### `DataPoint` type
 
 Represents a data point in the input data array. Two formats are currently supported:
 
@@ -110,3 +141,8 @@ otherwise the results will be unpredictable.
 `desiredLength: number` is the length of the downsampled array.
 
 This function will throw an error if the `desiredLength` is negative.
+
+## Acknowledgement
+
+The implementation is based on Sveinn Steinarsson's 2013 paper _Downsampling Time Series for
+Visual Representation_ that can be found [here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf).
