@@ -32,9 +32,9 @@ interface LegendItem {
 }
 
 interface MergedDataPoint extends XYDataPoint {
-  ltd: number;
-  ltob: number;
-  lttb: number;
+  ltd?: number;
+  ltob?: number;
+  lttb?: number;
 }
 
 export default class Chart extends React.PureComponent<ChartProps> {
@@ -73,7 +73,7 @@ export default class Chart extends React.PureComponent<ChartProps> {
     const isDownsamplingMethodActive = this.props.activeDownsamplingMethods.includes(downsamplingMethod);
     const activeDownsamplingMethods = isDownsamplingMethodActive
       ? this.props.activeDownsamplingMethods.filter(
-          activeDownsamplingMethod => activeDownsamplingMethod !== downsamplingMethod,
+          (activeDownsamplingMethod) => activeDownsamplingMethod !== downsamplingMethod,
         )
       : [...this.props.activeDownsamplingMethods, downsamplingMethod];
 
