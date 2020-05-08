@@ -67,5 +67,4 @@ cd "$DIST_PATH"
 npm publish --dry-run
 
 read -p "Press anything to release to NPM"
-
-# npm publish
+npm publish
