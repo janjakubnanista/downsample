@@ -78,3 +78,54 @@ export function splitIntoBuckets<T>(data: T[], desiredLength: number): T[][] {
 
   return splitData;
 }
+
+export const calculateMean = (values: number[]): number => {
+  let m = 0;
+  for (let i = 0; i < values.length; i += 1) {
+    m += values[i];
+  }
+
+  return m / values.length;
+};
+
+export const calculateSTD = (values: number[]): number => {
+  const mean = calculateMean(values);
+
+  let std = 0;
+  for (let i = 0; i < values.length; i += 1) {
+    std += (values[i] - mean) * (values[i] - mean);
+  }
+
+  return Math.sqrt(std / values.length);
+};
+
+// Simple moving average
+export const calculateSMA = (data: number[], range: number, slide: number) => {
+  let windowStart = 0;
+  let sum = 0;
+  let count = 0;
+  const values = [];
+
+  for (let i = 0; i < data.length; i++) {
+    if (isNaN(data[i])) {
+      data[i] = 0;
+    }
+    if (i - windowStart >= range) {
+      values.push(sum / count);
+      const oldStart = windowStart;
+      while (windowStart < data.length && windowStart - oldStart < slide) {
+        sum -= data[windowStart];
+        count -= 1;
+        windowStart += 1;
+      }
+    }
+    sum += data[i];
+    count += 1;
+  }
+
+  if (count == range) {
+    values.push(sum / count);
+  }
+
+  return values;
+};

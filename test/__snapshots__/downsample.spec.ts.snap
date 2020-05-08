@@ -1,0 +1,139 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`default export should have ASAP function 1`] = `
+Array [
+  1.75,
+  12.5,
+]
+`;
+
+exports[`default export should have LTD function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    1,
+    2,
+  ],
+]
+`;
+
+exports[`default export should have LTOB function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    7,
+    20,
+  ],
+]
+`;
+
+exports[`default export should have LTTB function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    1,
+    2,
+  ],
+]
+`;
+
+exports[`direct imports should have ASAP function 1`] = `
+Array [
+  5.5,
+  5.5,
+]
+`;
+
+exports[`direct imports should have LTD function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    1,
+    2,
+  ],
+]
+`;
+
+exports[`direct imports should have LTOB function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    7,
+    20,
+  ],
+]
+`;
+
+exports[`direct imports should have LTTB function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    1,
+    2,
+  ],
+]
+`;
+
+exports[`imports from root should have ASAP function 1`] = `
+Array [
+  1.75,
+  12.5,
+]
+`;
+
+exports[`imports from root should have LTD function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    1,
+    2,
+  ],
+]
+`;
+
+exports[`imports from root should have LTOB function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    7,
+    20,
+  ],
+]
+`;
+
+exports[`imports from root should have LTTB function 1`] = `
+Array [
+  Array [
+    0,
+    1,
+  ],
+  Array [
+    1,
+    2,
+  ],
+]
+`;
