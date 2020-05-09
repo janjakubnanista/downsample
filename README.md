@@ -26,121 +26,133 @@
   <a href="#usage">Usage</a>
   <span>|</span>
   <a href="#api">API</a>
+  <span>|</span>
+  <a href="#demo">Demo</a>
 </p>
 
-## Demo
-
-There is a very minimal interactive demo app available if you want to play around with the results of downsampling. [Check it out here](https://janjakubnanista.github.io/downsample/).
+`downsample` is useful when, not extremely surprisingly, you need to downsample a numeric time series before visualizing it without losing the visual characteristics of the data.
 
 <a id="installation"></a>
 ## Installation
 
-[downsample](https://www.npmjs.com/package/downsample) is an NPM module. Install using
+[downsample](https://www.npmjs.com/package/downsample) is an NPM module. You can easily download it by typing something like the following in your project:
 
-```
-  npm install downsample
-```
+```bash
+# for all the npm people out there
+npm install downsample
 
-Or
-
-```
-  yarn add downsample
+# or if you are a fan of yarn
+yarn add downsample
 ```
 
 <a id="usage"></a>
 ## Usage
 
-Three downsampling methods are currently supported, description of all three can be found [here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf):
+The package exports several methods for data downsampling:
 
-- Largest triangle three buckets (LTTB)
-- Largest triangle one bucket (LTOB)
-- Largest triangle dynamic (LTD)
+- **LTTB** Largest triangle three buckets [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
+- **LTOB** Largest triangle one bucket [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
+- **LTD** Largest triangle dynamic [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
 
-Downsampling a series of data points using either of these looks like this:
-
-```typescript
-// ES6 import syntax
-import { LTD, LTOB, LTTB } from "downsample";
-
-// You can also only import the bits you want
-import { LTD } from "downsample/methods/LTD";
-
-// Or old school
-var LTD = require("downsample").LTD;
-var LTOB = require("downsample").LTOB;
-var LTTB = require("downsample").LTTB;
-
-// The number of target data points, 100 for example
-const numPointsInDownsampledData: number = 100;
-
-// See the API docs for supported input data formats
-const data: DataPoint[] = [ ... ];
-const downsampledDataLTOB: DataPoint[] = LTOB(data, numPointsInDownsampledData);
-
-// downsampledDataLTOB now contains data downsampled to contain 
-// no more than numPointsInDownsampledData data points.
-//
-// the output data format matches the input one and data points are copied
-// shallowly to the resulting array
-```
+You can read more about the details of these in the [API](#api) section below.
 
 <a id="api"></a>
 ## API
 
+### `LTTB`
+
+Largest triangle three buckets ([read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)). If you are looking for the best performing method then look no more!
+
+```typescript
+function LTTB(data: DataPoint[], targetResolution: number): DataPoint[]
+```
+
+`LTTB` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments.
+
+The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
+
+```typescript
+import { LTTB } from 'downsample';
+
+// Or if your codebase does not supprot tree-shaking
+import { LTTB } from 'downsample/methods/LTTB';
+
+const chartWidth = 1000;
+const downsampled = LTTB([
+  [0, 1000],
+  [1, 1243],
+  // ...
+], chartWidth);
+```
+
+### `LTOB`
+
+Largest triangle one bucket ([read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)). Performs only slightly worse than LTTB.
+
+```typescript
+function LTOB(data: DataPoint[], targetResolution: number): DataPoint[]
+```
+
+`LTOB` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments.
+
+The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
+
+```typescript
+import { LTOB } from 'downsample';
+
+// Or if your codebase does not supprot tree-shaking
+import { LTOB } from 'downsample/methods/LTOB';
+
+const chartWidth = 1000;
+const downsampled = LTOB([
+  [0, 1000],
+  [1, 1243],
+  // ...
+], chartWidth);
+```
+
+### `LTD`
+
+Largest triangle dynamic ([read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)). The simplest downsampling method.
+
+```typescript
+function LTD(data: DataPoint[], targetResolution: number): DataPoint[]
+```
+
+`LTD` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments.
+
+The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
+
+```typescript
+import { LTD } from 'downsample';
+
+// Or if your codebase does not supprot tree-shaking
+import { LTD } from 'downsample/methods/LTD';
+
+const chartWidth = 1000;
+const downsampled = LTD([
+  [0, 1000],
+  [1, 1243],
+  // ...
+], chartWidth);
+```
+
+<a id="api/DataPoint"></a>
 ### `DataPoint` type
 
-Represents a data point in the input data array. Two formats are currently supported:
-
-`TupleDataPoint` is an array tuple of a `number` or a `Date` representing 
-the independent variable (e.g. time) and a `number` representing the value:
+Represents a data point in the input data array. These formats are currently supported:
 
 ```typescript
-const numericTupleDataPoint: TupleDataPoint = [1, 152.2];
-
-const dateTupleDataPoint: TupleDataPoint = [new Date(), 45.1];
+type DataPoint = 
+  [number, number] | 
+  [Date, number] | 
+  { x: number; y: number }
 ```
 
-`XYDataPoint` is an object hash with `x` property representing 
-the independent variable (e.g. time) and an `y` property the value:
+<a id="demo"></a>
+## Demo
 
-```typescript
-const numericXYDataPoint: XYDataPoint = { x: 1, y: 152.2 };
-
-const dateXYDataPoint: XYDataPoint = { x: new Date(), y: 152.2 };
-```
-
-### downsample.LTOB&lt;T extends DataPoint&gt;(data: T[], desiredLength: number): T[]
-
-Implementation of `Largest triangle one bucket` downsampling method.
-
-`data: DataPoint[]` is the input array. This array should be sorted by the independent variable
-otherwise the results will be unpredictable.
-
-`desiredLength: number` is the length of the downsampled array.
-
-This function will throw an error if the `desiredLength` is negative.
-
-### downsample.LTTB&lt;T extends DataPoint&gt;(data: T[], desiredLength: number): T[]
-
-Implementation of `Largest triangle three buckets` downsampling method.
-
-`data: DataPoint[]` is the input array. This array should be sorted by the independent variable
-otherwise the results will be unpredictable.
-
-`desiredLength: number` is the length of the downsampled array.
-
-This function will throw an error if the `desiredLength` is negative.
-
-### downsample.LTD&lt;T extends DataPoint&gt;(data: T[], desiredLength: number): T[]
-
-Implementation of `Largest triangle dynamic` downsampling method. Especially good for unevenly sampled data, for evenly spaced data `LTTB` should produce better results.
-
-`data: DataPoint[]` is the input array. This array should be sorted by the independent variable
-otherwise the results will be unpredictable.
-
-`desiredLength: number` is the length of the downsampled array.
-
-This function will throw an error if the `desiredLength` is negative.
+There is a very minimal interactive demo app available if you want to play around with the results of downsampling. [Check it out here](https://janjakubnanista.github.io/downsample/).
 
 ## Acknowledgement
 
