@@ -52,6 +52,7 @@ yarn add downsample
 
 The package exports several methods for data downsampling:
 
+- **ASAP** Automatic Smoothing for Attention Prioritization [read more here](http://futuredata.stanford.edu/asap/)
 - **LTTB** Largest triangle three buckets [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
 - **LTOB** Largest triangle one bucket [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
 - **LTD** Largest triangle dynamic [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
