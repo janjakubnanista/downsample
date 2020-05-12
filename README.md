@@ -28,6 +28,8 @@
   <a href="#api">API</a>
   <span>|</span>
   <a href="#demo">Demo</a>
+  <span>|</span>
+  <a href="#acknowledgement">Acknowledgement</a>
 </p>
 
 `downsample` is useful when, not extremely surprisingly, you need to downsample a numeric time series before visualizing it without losing the visual characteristics of the data.
@@ -58,6 +60,28 @@ You can read more about the details of these in the [API](#api) section below.
 
 <a id="api"></a>
 ## API
+
+### `ASAP` :boom: *new in 1.2.0* :boom:
+
+Automatic Smoothing for Attention Prioritization ([read more here](http://futuredata.stanford.edu/asap/)) is a smoothing rather than downsampling method - it will remove the short-term noise and reveal the large-scale deviations. Its API is also different from the other methods - it accepts an array of uniformly spaced numeric data points rather than `DataPoint` objects.
+
+```typescript
+function ASAP(data: number[], targetResolution: number): number[]
+```
+
+```typescript
+import { ASAP } from 'downsample';
+
+// Or if your codebase does not supprot tree-shaking
+import { ASAP } from 'downsample/methods/ASAP';
+
+const chartWidth = 1000;
+const smooth = ASAP([
+  1000,
+  1243,
+  // ...
+], chartWidth);
+```
 
 ### `LTTB`
 
@@ -154,7 +178,10 @@ type DataPoint =
 
 There is a very minimal interactive demo app available if you want to play around with the results of downsampling. [Check it out here](https://janjakubnanista.github.io/downsample/).
 
+<a id="acknowledgement"></a>
 ## Acknowledgement
 
-The implementation is based on Sveinn Steinarsson's 2013 paper _Downsampling Time Series for
+The implementation of `LTD`, `LTOB` and `LTTB` is based on Sveinn Steinarsson's 2013 paper _Downsampling Time Series for
 Visual Representation_ that can be found [here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf).
+
+The implementation of `ASAP` is based on Kexin Rong's and Peter Bailis's 2017 paper. _ASAP: Prioritizing Attention via Time Series Smoothing_ that can be found [here](https://arxiv.org/pdf/1703.00983.pdf). The original code can be found [here](https://github.com/stanford-futuredata/ASAP/blob/master/ASAP-optimized.js)
