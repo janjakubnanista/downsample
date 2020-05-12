@@ -59,6 +59,28 @@ You can read more about the details of these in the [API](#api) section below.
 <a id="api"></a>
 ## API
 
+### `ASAP` :boom: *new in 1.2.0* :boom:
+
+Automatic Smoothing for Attention Prioritization ([read more here](http://futuredata.stanford.edu/asap/)) is a smoothing rather than downsampling method - it will remove the short-term noise and reveal the large-scale deviations. Its API is also different from the other methods - it accepts an array of uniformly spaced numeric data points rather than `DataPoint` objects.
+
+```typescript
+function ASAP(data: number[], targetResolution: number): number[]
+```
+
+```typescript
+import { ASAP } from 'downsample';
+
+// Or if your codebase does not supprot tree-shaking
+import { ASAP } from 'downsample/methods/ASAP';
+
+const chartWidth = 1000;
+const smooth = ASAP([
+  1000,
+  1243,
+  // ...
+], chartWidth);
+```
+
 ### `LTTB`
 
 Largest triangle three buckets ([read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)). If you are looking for the best performing method then look no more!
