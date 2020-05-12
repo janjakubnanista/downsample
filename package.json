@@ -80,7 +80,7 @@
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "ts-jest": "^25.5.0",
-    "ts-loader": "^7.0.3",
+    "ts-loader": "^7.0.4",
     "ts-node": "^8.10.1",
     "typescript": "^3.8.3",
     "webpack": "^4.43.0",
@@ -94,6 +94,9 @@
   },
   "jest": {
     "preset": "ts-jest",
+    "testMatch": [
+      "**/*.spec.ts"
+    ],
     "testPathIgnorePatterns": [
       "<rootDir>/test",
       "/node_modules/"

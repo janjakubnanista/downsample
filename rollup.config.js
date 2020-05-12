@@ -20,6 +20,7 @@ const configForFile = (fileName, displayName = fileName) => {
 
 export default [
   configForFile('index', 'downsample'),
+  configForFile('methods/ASAP'),
   configForFile('methods/LTD'),
   configForFile('methods/LTOB'),
   configForFile('methods/LTTB'),
