@@ -63,80 +63,85 @@ const findWindowSize = (
   return windowSize;
 };
 
-class ACF {
-  private readonly CORR_THRESH: number = 0.2;
-
-  public readonly correlations: number[];
-
-  public readonly mean: number;
-
-  public maxACF = 0;
-
-  constructor(public readonly values: number[], maxLag: number) {
-    this.mean = calculateMean(values);
-    this.correlations = new Array(maxLag);
-
-    this.calculate();
-  }
-
-  calculate(): void {
-    /* Padding to the closest power of 2 */
-    const len = Math.pow(2, Math.trunc(Math.log2(this.values.length)) + 1);
-    const fftreal = new Array(len).fill(0);
-    const fftimg = new Array(len).fill(0);
-
-    for (let i = 0; i < this.values.length; i += 1) {
-      fftreal[i] = this.values[i] - this.mean;
-    }
-
-    /* F_R(f) = FFT(X) */
-    fft(fftreal, fftimg);
-
-    /* S(f) = F_R(f)F_R*(f) */
-    for (let i = 0; i < fftreal.length; i += 1) {
-      fftreal[i] = Math.pow(fftreal[i], 2) + Math.pow(fftimg[i], 2);
-      fftimg[i] = 0;
-    }
-
-    /*  R(t) = IFFT(S(f)) */
-    inverseFFT(fftreal, fftimg);
-    for (let i = 1; i < this.correlations.length; i += 1) {
-      this.correlations[i] = fftreal[i] / fftreal[0];
-    }
-  }
-
-  findPeaks() {
-    const peakIndices = [];
-    if (this.correlations.length > 1) {
-      let positive = this.correlations[1] > this.correlations[0];
-      let max = 1;
-      for (let i = 2; i < this.correlations.length; i += 1) {
-        if (!positive && this.correlations[i] > this.correlations[i - 1]) {
-          max = i;
-          positive = !positive;
-        } else if (positive && this.correlations[i] > this.correlations[max]) {
-          max = i;
-        } else if (positive && this.correlations[i] < this.correlations[i - 1]) {
-          if (max > 1 && this.correlations[max] > this.CORR_THRESH) {
-            peakIndices.push(max);
-            if (this.correlations[max] > this.maxACF) {
-              this.maxACF = this.correlations[max];
-            }
-          }
-          positive = !positive;
-        }
-      }
-    }
-    /* If there is no autocorrelation peak within the MAX_WINDOW boundary try windows from the largest to the smallest */
-    if (peakIndices.length <= 1) {
-      for (let i = 2; i < this.correlations.length; i += 1) {
-        peakIndices.push(i);
-      }
-    }
-
-    return peakIndices;
-  }
+interface Autocorrelation {
+  readonly peaks: number[];
+  readonly correlations: number[];
+  readonly maxCorrelation: number;
 }
+
+const calculatePeaks = (correlations: number[], threshold = 0.2): [number[], number] => {
+  const { length } = correlations;
+  if (length <= 1) return [[], 0];
+
+  let maxCorrelation = 0;
+  const peaks: number[] = [];
+
+  if (correlations.length > 1) {
+    let positive = correlations[1] > correlations[0];
+    let max = 1;
+    for (let i = 2; i < correlations.length; i += 1) {
+      if (!positive && correlations[i] > correlations[i - 1]) {
+        max = i;
+        positive = !positive;
+      } else if (positive && correlations[i] > correlations[max]) {
+        max = i;
+      } else if (positive && correlations[i] < correlations[i - 1]) {
+        if (max > 1 && correlations[max] > threshold) {
+          peaks.push(max);
+          if (correlations[max] > maxCorrelation) {
+            maxCorrelation = correlations[max];
+          }
+        }
+        positive = !positive;
+      }
+    }
+  }
+
+  /* If there is no autocorrelation peak within the MAX_WINDOW boundary try windows from the largest to the smallest */
+  if (peaks.length <= 1) {
+    for (let i = 2; i < length; i += 1) {
+      peaks.push(i);
+    }
+  }
+
+  return [peaks, maxCorrelation];
+};
+
+const calculateAutocorrelation = (values: number[], maxLag: number): Autocorrelation => {
+  const { length } = values;
+  const mean = calculateMean(values);
+
+  /* Padding to the closest power of 2 */
+  const len = Math.pow(2, Math.trunc(Math.log2(length)) + 1);
+  const fftreal = new Array(len).fill(0);
+  const fftimg = new Array(len).fill(0);
+
+  for (let i = 0; i < length; i += 1) {
+    fftreal[i] = values[i] - mean;
+  }
+
+  /* F_R(f) = FFT(X) */
+  fft(fftreal, fftimg);
+
+  /* S(f) = F_R(f)F_R*(f) */
+  for (let i = 0; i < fftreal.length; i += 1) {
+    fftreal[i] = Math.pow(fftreal[i], 2) + Math.pow(fftimg[i], 2);
+    fftimg[i] = 0;
+  }
+
+  /*  R(t) = IFFT(S(f)) */
+  inverseFFT(fftreal, fftimg);
+
+  // Calculate correlations
+  const correlations: number[] = [];
+  for (let i = 1; i < maxLag; i++) {
+    correlations[i] = fftreal[i] / fftreal[0];
+  }
+
+  const [peaks, maxCorrelation] = calculatePeaks(correlations);
+
+  return { correlations, peaks, maxCorrelation };
+};
 
 export function ASAP(data: number[], desiredLength: number) {
   if (desiredLength < 0) {
@@ -152,12 +157,9 @@ export function ASAP(data: number[], desiredLength: number) {
     data = calculateSMA(data, Math.trunc(data.length / desiredLength), Math.trunc(data.length / desiredLength));
   }
 
-  const acf = new ACF(data, Math.round(data.length / 10));
-  const peaks = acf.findPeaks();
-  // let metrics = new Metrics(data);
+  const { correlations, peaks, maxCorrelation } = calculateAutocorrelation(data, Math.round(data.length / 10));
   const originalKurtosis = calculateKurtosis(data);
   let minRoughness = calculateRoughness(data);
-  // let minObj = metrics.roughness();
   let windowSize = 1;
   let lb = 1;
   let largestFeasible = -1;
@@ -166,10 +168,10 @@ export function ASAP(data: number[], desiredLength: number) {
     const w = peaks[i];
     if (w < lb || w == 1) {
       break;
-    } else if (Math.sqrt(1 - acf.correlations[w]) * windowSize > Math.sqrt(1 - acf.correlations[windowSize]) * w) {
+    } else if (Math.sqrt(1 - correlations[w]) * windowSize > Math.sqrt(1 - correlations[windowSize]) * w) {
       continue;
     }
-    // metrics = new Metrics(smoothed);
+
     const smoothed = calculateSMA(data, w, 1);
     const kurtosis = calculateKurtosis(smoothed);
     const roughness = calculateRoughness(smoothed);
@@ -178,12 +180,14 @@ export function ASAP(data: number[], desiredLength: number) {
         minRoughness = roughness;
         windowSize = w;
       }
-      lb = Math.round(Math.max(w * Math.sqrt((acf.maxACF - 1) / (acf.correlations[w] - 1)), lb));
+
+      lb = Math.round(Math.max(w * Math.sqrt((maxCorrelation - 1) / (correlations[w] - 1)), lb));
       if (largestFeasible < 0) {
         largestFeasible = i;
       }
     }
   }
+
   if (largestFeasible > 0) {
     if (largestFeasible < peaks.length - 2) {
       tail = peaks[largestFeasible + 1];
