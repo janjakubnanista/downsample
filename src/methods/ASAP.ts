@@ -1,31 +1,65 @@
 import { calculateMean, calculateSMA, calculateSTD } from '../utils';
 import { fft, inverseFFT } from '../fft';
 
+const calculateDiffs = (values: number[]): number[] => {
+  const length = values.length - 1;
+  if (length < 1) return [];
+
+  const diffs = new Array(length);
+  for (let i = 0; i < length; i++) {
+    diffs[i] = values[i + 1] - values[i];
+  }
+
+  return diffs;
+};
+
+const calculateRoughness = (values: number[]): number => calculateSTD(calculateDiffs(values));
+
+const calculateKurtosis = (values: number[]): number => {
+  const length = values.length;
+  const mean = calculateMean(values);
+
+  let u4 = 0;
+  let variance = 0;
+  let diff: number;
+  let diffSqr: number;
+  for (let i = 0; i < length; i++) {
+    diff = values[i] - mean;
+    diffSqr = diff * diff;
+
+    u4 += diffSqr * diffSqr;
+    variance += diffSqr;
+  }
+  return (length * u4) / (variance * variance);
+};
+
 const findWindowSize = (
   head: number,
   tail: number,
   data: number[],
-  minObj: number,
+  minRoughness: number,
   originalKurt: number,
   windowSize: number,
 ): number => {
   while (head <= tail) {
     const w = Math.round((head + tail) / 2);
     const smoothed = calculateSMA(data, w, 1);
-    const metrics = new Metrics(smoothed);
-    if (metrics.kurtosis() >= originalKurt) {
+    const kurtosis = calculateKurtosis(smoothed);
+    if (kurtosis >= originalKurt) {
       /* Search second half if feasible */
-      const roughness = metrics.roughness();
-      if (roughness < minObj) {
+      const roughness = calculateRoughness(smoothed);
+      if (roughness < minRoughness) {
         windowSize = w;
-        minObj = roughness;
+        minRoughness = roughness;
       }
+
       head = w + 1;
     } else {
       /* Search first half */
       tail = w - 1;
     }
   }
+
   return windowSize;
 };
 
@@ -104,54 +138,26 @@ class ACF {
   }
 }
 
-class Metrics {
-  public readonly len: number;
-
-  public readonly mean: number;
-
-  constructor(public readonly values: number[]) {
-    this.len = values.length;
-    this.mean = calculateMean(values);
+export function ASAP(data: number[], desiredLength: number) {
+  if (desiredLength < 0) {
+    throw new Error(`Supplied negative desiredLength parameter to ASAP: ${desiredLength}`);
   }
 
-  kurtosis(): number {
-    let u4 = 0;
-    let variance = 0;
-    for (let i = 0; i < this.len; i++) {
-      u4 += Math.pow(this.values[i] - this.mean, 4);
-      variance += Math.pow(this.values[i] - this.mean, 2);
-    }
-    return (this.len * u4) / Math.pow(variance, 2);
-  }
-
-  roughness(): number {
-    return calculateSTD(this.diffs());
-  }
-
-  diffs(): number[] {
-    const diff = new Array(this.len - 1);
-    for (let i = 1; i < this.len; i += 1) {
-      diff[i - 1] = this.values[i] - this.values[i - 1];
-    }
-    return diff;
-  }
-}
-
-export function ASAP(data: number[], resolution: number) {
   /* Ignore the last value if it's NaN */
   if (isNaN(data[data.length - 1])) {
     data = data.slice(0, -1);
   }
 
-  if (data.length >= 2 * resolution) {
-    data = calculateSMA(data, Math.trunc(data.length / resolution), Math.trunc(data.length / resolution));
+  if (data.length >= 2 * desiredLength) {
+    data = calculateSMA(data, Math.trunc(data.length / desiredLength), Math.trunc(data.length / desiredLength));
   }
 
   const acf = new ACF(data, Math.round(data.length / 10));
   const peaks = acf.findPeaks();
-  let metrics = new Metrics(data);
-  const originalKurt = metrics.kurtosis();
-  let minObj = metrics.roughness();
+  // let metrics = new Metrics(data);
+  const originalKurtosis = calculateKurtosis(data);
+  let minRoughness = calculateRoughness(data);
+  // let minObj = metrics.roughness();
   let windowSize = 1;
   let lb = 1;
   let largestFeasible = -1;
@@ -163,12 +169,13 @@ export function ASAP(data: number[], resolution: number) {
     } else if (Math.sqrt(1 - acf.correlations[w]) * windowSize > Math.sqrt(1 - acf.correlations[windowSize]) * w) {
       continue;
     }
+    // metrics = new Metrics(smoothed);
     const smoothed = calculateSMA(data, w, 1);
-    metrics = new Metrics(smoothed);
-    const roughness = metrics.roughness();
-    if (metrics.kurtosis() >= originalKurt) {
-      if (roughness < minObj) {
-        minObj = roughness;
+    const kurtosis = calculateKurtosis(smoothed);
+    const roughness = calculateRoughness(smoothed);
+    if (kurtosis >= originalKurtosis) {
+      if (roughness < minRoughness) {
+        minRoughness = roughness;
         windowSize = w;
       }
       lb = Math.round(Math.max(w * Math.sqrt((acf.maxACF - 1) / (acf.correlations[w] - 1)), lb));
@@ -184,7 +191,7 @@ export function ASAP(data: number[], resolution: number) {
     lb = Math.max(lb, peaks[largestFeasible] + 1);
   }
 
-  windowSize = findWindowSize(lb, tail, data, minObj, originalKurt, windowSize);
+  windowSize = findWindowSize(lb, tail, data, minRoughness, originalKurtosis, windowSize);
 
   return calculateSMA(data, windowSize, 1);
 }
