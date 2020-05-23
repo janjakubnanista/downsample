@@ -2,7 +2,7 @@ import 'jest';
 import { DataPoint } from '../../types';
 import { LTD } from '../LTD';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
-import data from './testdata.json';
+import data from '../../../data/power.json';
 
 describe('LTD', () => {
   const MAX_DATA_LENGTH = 5000;

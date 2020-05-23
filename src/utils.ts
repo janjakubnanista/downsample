@@ -1,32 +1,12 @@
-import { DataPoint, NormalizedDataPoint, TupleDataPoint, X, XYDataPoint } from './types';
-
-const isTupleDataPoint = (dataPoint: DataPoint): dataPoint is TupleDataPoint => {
-  return Array.isArray(dataPoint);
-};
-
-const isXYDataPoint = (dataPoint: DataPoint): dataPoint is XYDataPoint => {
-  return !!dataPoint && 'x' in dataPoint && 'y' in dataPoint;
-};
-
-const normalizeX = (x: X): number => (x instanceof Date ? x.getTime() : x);
-
-export function normalizeDataPoint(dataPoint: DataPoint): NormalizedDataPoint | undefined {
-  if (!dataPoint) return undefined;
-
-  if (isXYDataPoint(dataPoint)) {
-    return [normalizeX(dataPoint.x), dataPoint.y];
-  }
-
-  if (isTupleDataPoint(dataPoint)) {
-    return [normalizeX(dataPoint[0]), dataPoint[1]];
-  }
-
-  throw new Error(`Invalid data point format supplied: ${JSON.stringify(dataPoint)}`);
-}
-
-export function normalizeDataPoints(dataPoints: DataPoint[]): NormalizedDataPoint[] {
-  return dataPoints.map(normalizeDataPoint).filter(Boolean) as NormalizedDataPoint[];
-}
+import {
+  DataPoint,
+  NormalizedDataPoint,
+  NumericPropertyAccessor,
+  PointValueExtractor,
+  SmoothingFunctionConfig,
+  XYDataPoint,
+} from './types';
+import { isA } from 'ts-type-checked';
 
 export function calculateTriangleArea(
   pointA: NormalizedDataPoint,
@@ -99,33 +79,33 @@ export const calculateSTD = (values: number[]): number => {
   return Math.sqrt(std / values.length);
 };
 
-// Simple moving average
-export const calculateSMA = (data: number[], range: number, slide: number) => {
-  let windowStart = 0;
-  let sum = 0;
-  let count = 0;
-  const values = [];
+export const getPointValueExtractor = <P>(
+  accessor: NumericPropertyAccessor<P> | PointValueExtractor<P>,
+): PointValueExtractor<P> => {
+  if (isA<PointValueExtractor<unknown>>(accessor)) return accessor;
+  if (isA<NumericPropertyAccessor<unknown>>(accessor)) return (point) => point[accessor];
 
-  for (let i = 0; i < data.length; i++) {
-    if (isNaN(data[i])) {
-      data[i] = 0;
-    }
-    if (i - windowStart >= range) {
-      values.push(sum / count);
-      const oldStart = windowStart;
-      while (windowStart < data.length && windowStart - oldStart < slide) {
-        sum -= data[windowStart];
-        count -= 1;
-        windowStart += 1;
-      }
-    }
-    sum += data[i];
-    count += 1;
-  }
-
-  if (count == range) {
-    values.push(sum / count);
-  }
-
-  return values;
+  throw new Error('Invalid point value accessor: ' + accessor);
 };
+
+export const createNormalize = <P>(
+  x: NumericPropertyAccessor<P> | PointValueExtractor<P>,
+  y: NumericPropertyAccessor<P> | PointValueExtractor<P>,
+) => {
+  const getX = getPointValueExtractor(x);
+  const getY = getPointValueExtractor(y);
+
+  return (data: P[]): NormalizedDataPoint[] => data.map((point) => [getX(point), getY(point)]);
+};
+
+export const createXYDataPoint = (time: number, value: number): XYDataPoint => ({ x: time, y: value });
+
+export const createLegacyDataPointConfig = (): SmoothingFunctionConfig<DataPoint> => ({
+  x: (point: DataPoint) => {
+    const t = isA<XYDataPoint>(point) ? point.x : point[0];
+
+    return isA<Date>(t) ? t.getTime() : t;
+  },
+  y: (point: DataPoint) => ('y' in point ? point.y : point[1]),
+  toPoint: createXYDataPoint,
+});

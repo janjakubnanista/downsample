@@ -13,7 +13,7 @@ const DATA_POINTS: TupleDataPoint[] = NUMERIC_DATA.map((value, index) => [index,
 describe('imports from root', () => {
   it('should have ASAP function', () => {
     expect(ASAP).toBeInstanceOf(Function);
-    expect(ASAP(NUMERIC_DATA, 2)).toMatchSnapshot();
+    expect(ASAP(DATA_POINTS, 2)).toMatchSnapshot();
   });
 
   it('should have LTD function', () => {
@@ -35,7 +35,7 @@ describe('imports from root', () => {
 describe('default export', () => {
   it('should have ASAP function', () => {
     expect(downsample.ASAP).toBeInstanceOf(Function);
-    expect(downsample.ASAP(NUMERIC_DATA, 2)).toMatchSnapshot();
+    expect(downsample.ASAP(DATA_POINTS, 2)).toMatchSnapshot();
   });
 
   it('should have LTD function', () => {
@@ -57,7 +57,7 @@ describe('default export', () => {
 describe('direct imports', () => {
   it('should have ASAP function', () => {
     expect(ASAP2).toBeInstanceOf(Function);
-    expect(ASAP2([1, 10, 1, 10, 5], 2)).toMatchSnapshot();
+    expect(ASAP2(DATA_POINTS, 2)).toMatchSnapshot();
   });
 
   it('should have LTD function', () => {

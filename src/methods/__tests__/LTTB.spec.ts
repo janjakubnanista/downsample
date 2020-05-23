@@ -2,7 +2,7 @@ import 'jest';
 import { DataPoint } from '../../types';
 import { LTTB } from '../LTTB';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
-import data from './testdata.json';
+import data from '../../../data/power.json';
 
 describe('LTTB', () => {
   describe('with XYDataPoint with Date', () => testMethod(makeXYDateTestData(data)));

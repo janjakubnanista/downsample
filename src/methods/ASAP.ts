@@ -1,4 +1,6 @@
-import { calculateMean, calculateSMA, calculateSTD } from '../utils';
+import { DownsamplingFunction, SmoothingFunctionConfig } from '../types';
+import { SMANumeric, createSMA } from './SMA';
+import { calculateMean, calculateSTD, createLegacyDataPointConfig, getPointValueExtractor } from '../utils';
 import { fft, inverseFFT } from '../fft';
 
 const calculateDiffs = (values: number[]): number[] => {
@@ -43,7 +45,7 @@ const findWindowSize = (
 ): number => {
   while (head <= tail) {
     const w = Math.round((head + tail) / 2);
-    const smoothed = calculateSMA(data, w, 1);
+    const smoothed = SMANumeric(data, w, 1);
     const kurtosis = calculateKurtosis(smoothed);
     if (kurtosis >= originalKurt) {
       /* Search second half if feasible */
@@ -143,59 +145,69 @@ const calculateAutocorrelation = (values: number[], maxLag: number): Autocorrela
   return { correlations, peaks, maxCorrelation };
 };
 
-export function ASAP(data: number[], desiredLength: number) {
-  if (desiredLength < 0) {
-    throw new Error(`Supplied negative desiredLength parameter to ASAP: ${desiredLength}`);
-  }
+export const createASAP = <T>(config: SmoothingFunctionConfig<T>): DownsamplingFunction<T, [number]> => {
+  const valueExtractor = getPointValueExtractor(config.y);
+  const SMA = createSMA(config);
 
-  /* Ignore the last value if it's NaN */
-  if (isNaN(data[data.length - 1])) {
-    data = data.slice(0, -1);
-  }
-
-  if (data.length >= 2 * desiredLength) {
-    data = calculateSMA(data, Math.trunc(data.length / desiredLength), Math.trunc(data.length / desiredLength));
-  }
-
-  const { correlations, peaks, maxCorrelation } = calculateAutocorrelation(data, Math.round(data.length / 10));
-  const originalKurtosis = calculateKurtosis(data);
-  let minRoughness = calculateRoughness(data);
-  let windowSize = 1;
-  let lb = 1;
-  let largestFeasible = -1;
-  let tail = data.length / 10;
-  for (let i = peaks.length - 1; i >= 0; i -= 1) {
-    const w = peaks[i];
-    if (w < lb || w == 1) {
-      break;
-    } else if (Math.sqrt(1 - correlations[w]) * windowSize > Math.sqrt(1 - correlations[windowSize]) * w) {
-      continue;
+  return function ASAP(values, resolution): T[] {
+    if (values.length === 0) return [];
+    if (resolution <= 0) {
+      throw new Error(`Supplied non-positive resolution parameter to ASAP: ${resolution}`);
     }
 
-    const smoothed = calculateSMA(data, w, 1);
-    const kurtosis = calculateKurtosis(smoothed);
-    const roughness = calculateRoughness(smoothed);
-    if (kurtosis >= originalKurtosis) {
-      if (roughness < minRoughness) {
-        minRoughness = roughness;
-        windowSize = w;
+    // If the resolution is at least twice as big as the number of data points
+    // then the values get downsampled to desired resolution first by SMA
+    if (values.length >= 2 * resolution) {
+      const scale = Math.trunc(values.length / resolution);
+
+      return ASAP(SMA(values, scale, scale), resolution);
+    }
+
+    // First turn data points into a sequence of values
+    const data: number[] = values.map(valueExtractor);
+
+    const { correlations, peaks, maxCorrelation } = calculateAutocorrelation(data, Math.round(data.length / 10));
+    const originalKurtosis = calculateKurtosis(data);
+    let minRoughness = calculateRoughness(data);
+    let windowSize = 1;
+    let lb = 1;
+    let largestFeasible = -1;
+    let tail = data.length / 10;
+    for (let i = peaks.length - 1; i >= 0; i -= 1) {
+      const w = peaks[i];
+      if (w < lb || w === 1) {
+        break;
+      } else if (Math.sqrt(1 - correlations[w]) * windowSize > Math.sqrt(1 - correlations[windowSize]) * w) {
+        continue;
       }
 
-      lb = Math.round(Math.max(w * Math.sqrt((maxCorrelation - 1) / (correlations[w] - 1)), lb));
-      if (largestFeasible < 0) {
-        largestFeasible = i;
+      const smoothed = SMANumeric(data, w, 1);
+      const kurtosis = calculateKurtosis(smoothed);
+      const roughness = calculateRoughness(smoothed);
+      if (kurtosis >= originalKurtosis) {
+        if (roughness < minRoughness) {
+          minRoughness = roughness;
+          windowSize = w;
+        }
+
+        lb = Math.round(Math.max(w * Math.sqrt((maxCorrelation - 1) / (correlations[w] - 1)), lb));
+        if (largestFeasible < 0) {
+          largestFeasible = i;
+        }
       }
     }
-  }
 
-  if (largestFeasible > 0) {
-    if (largestFeasible < peaks.length - 2) {
-      tail = peaks[largestFeasible + 1];
+    if (largestFeasible > 0) {
+      if (largestFeasible < peaks.length - 2) {
+        tail = peaks[largestFeasible + 1];
+      }
+      lb = Math.max(lb, peaks[largestFeasible] + 1);
     }
-    lb = Math.max(lb, peaks[largestFeasible] + 1);
-  }
 
-  windowSize = findWindowSize(lb, tail, data, minRoughness, originalKurtosis, windowSize);
+    windowSize = findWindowSize(lb, tail, data, minRoughness, originalKurtosis, windowSize);
 
-  return calculateSMA(data, windowSize, 1);
-}
+    return SMA(values, windowSize, 1);
+  };
+};
+
+export const ASAP = createASAP(createLegacyDataPointConfig());
