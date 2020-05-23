@@ -1,4 +1,4 @@
-import { Legend, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Legend, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import React from 'react';
 
 export interface ChartProps {
