@@ -3,13 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "webpack --mode production",
-    "clean": "rm -rf demo/dist",
-    "upload": "gh-pages -d demo/dist",
     "start": "start-storybook -p 6006",
-    "publish": "storybook-to-ghpages",
-    "start:webpack": "webpack-dev-server --mode development",
-    "publish:webpack": "yarn clean && yarn build && yarn upload"
+    "deploy": "storybook-to-ghpages"
   },
   "dependencies": {
     "downsample": "^1.1.0",
@@ -31,12 +26,10 @@
     "@types/recharts": "^1.0.23",
     "@types/styled-components": "5.1.0",
     "gh-pages": "^2.2.0",
-    "html-webpack-plugin": "^4.3.0",
     "storybook": "^5.3.14",
     "ts-loader": "^7.0.4",
     "typescript": "^3.8.3",
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.1.4"
+    "webpack-cli": "^3.3.11"
   }
 }
