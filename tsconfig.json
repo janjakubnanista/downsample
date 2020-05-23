@@ -15,6 +15,9 @@
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "plugins": [
+      { "transform": "ts-type-checked/transformer" }
+    ],
     "preserveConstEnums": true,
     "resolveJsonModule": true,
     "removeComments": false,

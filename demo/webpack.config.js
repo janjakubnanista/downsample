@@ -1,8 +1,9 @@
 const path = require('path');
+const transformer = require('ts-type-checked/transformer').default;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const rootDir = path.join(__dirname, 'demo/src');
-const distDir = path.join(__dirname, 'demo/dist');
+const rootDir = path.join(__dirname, 'src');
+const distDir = path.join(__dirname, 'dist');
 
 module.exports = {
   entry: path.join(rootDir, 'index.tsx'),
@@ -14,20 +15,23 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'awesome-typescript-loader',
+        loader: 'ts-loader',
+        options: {
+          getCustomTransformers: (program) => ({
+            before: [transformer(program)],
+          }),
+        },
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(rootDir, 'index.html'),
-      filename: path.join(distDir, 'index.html'),
+      template: path.join(rootDir, 'index.ejs'),
     }),
   ],
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
     mainFields: ['main'],
-    // modules: [rootDir, "node_modules"]
   },
   devServer: {
     port: 3001,

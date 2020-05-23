@@ -1,0 +1,42 @@
+{
+  "name": "@downsample/demo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "webpack --mode production",
+    "clean": "rm -rf demo/dist",
+    "upload": "gh-pages -d demo/dist",
+    "start": "start-storybook -p 6006",
+    "publish": "storybook-to-ghpages",
+    "start:webpack": "webpack-dev-server --mode development",
+    "publish:webpack": "yarn clean && yarn build && yarn upload"
+  },
+  "dependencies": {
+    "downsample": "^1.1.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-grid-system": "^6.4.2",
+    "recharts": "^1.8.5",
+    "styled-components": "^5.1.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-knobs": "^5.2.1",
+    "@storybook/addon-links": "^5.3.18",
+    "@storybook/addons": "^5.3.14",
+    "@storybook/cli": "^5.2.1",
+    "@storybook/react": "^5.3.14",
+    "@storybook/storybook-deployer": "^2.8.6",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "@types/recharts": "^1.0.23",
+    "@types/styled-components": "5.1.0",
+    "gh-pages": "^2.2.0",
+    "html-webpack-plugin": "^4.3.0",
+    "storybook": "^5.3.14",
+    "ts-loader": "^7.0.4",
+    "typescript": "^3.8.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.1.4"
+  }
+}
