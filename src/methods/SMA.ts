@@ -49,7 +49,7 @@ export const createSMA = <T>(
 
     for (let i = windowSize; i <= data.length; i++) {
       if ((i - windowSize) % slide === 0) {
-        output.push(pointFactory((times[i - windowSize] + times[i]) / 2, sum / windowSize, i - windowSize));
+        output.push(pointFactory((times[i - windowSize] + times[i - 1]) / 2, sum / windowSize, i - windowSize));
       }
 
       sum += data[i] - data[i - windowSize];

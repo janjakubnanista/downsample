@@ -1,6 +1,6 @@
 import 'jest';
 import { ASAP } from '../ASAP';
-import { DataPoint } from '../../types';
+import { DataPoint, TupleDataPoint } from '../../types';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
 import data from '../../../data/power.json';
 
@@ -37,6 +37,8 @@ describe('ASAP', () => {
     it('should throw an error if desiredLength is zero', () => {
       expect(() => ASAP(data, 0)).toThrow();
     });
+
+    [];
 
     it('should return desired number of data points', () => {
       expect(ASAP(data, 3)).toHaveLength(3);
