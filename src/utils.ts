@@ -83,9 +83,8 @@ export const getPointValueExtractor = <P>(
   accessor: NumericPropertyAccessor<P> | PointValueExtractor<P>,
 ): PointValueExtractor<P> => {
   if (isA<PointValueExtractor<unknown>>(accessor)) return accessor;
-  if (isA<NumericPropertyAccessor<unknown>>(accessor)) return (point) => point[accessor];
 
-  throw new Error('Invalid point value accessor: ' + accessor);
+  return (point: P) => (point as any)[accessor];
 };
 
 export const createNormalize = <P>(

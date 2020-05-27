@@ -25,7 +25,7 @@ export type NumericPropertyNames<T> = {
 
 // TODO P extends [] does not cover all the tuple cases with heterogenous tuples
 // and it would be nice to have a (generated) type for that
-export type NumericPropertyAccessor<P> = P extends [] ? number : NumericPropertyNames<P>;
+export type NumericPropertyAccessor<P> = P extends unknown[] ? number : NumericPropertyNames<P>;
 
 export type PointValueExtractor<P> = (point: P) => Value;
 
