@@ -53,6 +53,7 @@ yarn add downsample
 The package exports several methods for data downsampling:
 
 - **ASAP** Automatic Smoothing for Attention Prioritization [read more here](http://futuredata.stanford.edu/asap/)
+- **SMA** Simple moving average [read more here](https://en.wikipedia.org/wiki/Moving_average#Simple_moving_average)
 - **LTTB** Largest triangle three buckets [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
 - **LTOB** Largest triangle one bucket [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
 - **LTD** Largest triangle dynamic [read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)
@@ -64,10 +65,12 @@ You can read more about the details of these in the [API](#api) section below.
 
 ### `ASAP` :boom: *new in 1.2.0* :boom:
 
-Automatic Smoothing for Attention Prioritization ([read more here](http://futuredata.stanford.edu/asap/)) is a smoothing rather than downsampling method - it will remove the short-term noise and reveal the large-scale deviations. Its API is also different from the other methods - it accepts an array of uniformly spaced numeric data points rather than `DataPoint` objects.
+Automatic Smoothing for Attention Prioritization ([read more here](http://futuredata.stanford.edu/asap/)) is a smoothing rather than downsampling method - it will remove the short-term noise and reveal the large-scale deviations.
+
+`ASAP` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments.
 
 ```typescript
-function ASAP(data: number[], targetResolution: number): number[]
+function ASAP(data: DataPoint[], targetResolution: number): number[]
 ```
 
 ```typescript
@@ -78,8 +81,32 @@ import { ASAP } from 'downsample/methods/ASAP';
 
 const chartWidth = 1000;
 const smooth = ASAP([
-  1000,
-  1243,
+  [0, 1000],
+  [1, 1243],
+  // ...
+], chartWidth);
+```
+
+### `SMA` :boom: *new in 1.2.0* :boom:
+
+Simple moving average with variable slide ([read more here](https://en.wikipedia.org/wiki/Moving_average#Simple_moving_average)).
+
+`SMA` accepts an array of data points (see [DataPoint](#api/DataPoint)), size of a window over which to calculate average and a slide - an amount by which the window is shifted.
+
+```typescript
+function SMA(data: DataPoint[], windowSize: number, slide?: number = 1): number[]
+```
+
+```typescript
+import { SMA } from 'downsample';
+
+// Or if your codebase does not supprot tree-shaking
+import { SMA } from 'downsample/methods/SMA';
+
+const chartWidth = 1000;
+const smooth = SMA([
+  [0, 1000],
+  [1, 1243],
   // ...
 ], chartWidth);
 ```
@@ -171,7 +198,8 @@ Represents a data point in the input data array. These formats are currently sup
 type DataPoint = 
   [number, number] | 
   [Date, number] | 
-  { x: number; y: number }
+  { x: number; y: number } |
+  { x: Date; y: number } |
 ```
 
 <a id="demo"></a>
