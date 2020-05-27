@@ -2,8 +2,14 @@
 
 exports[`default export should have ASAP function 1`] = `
 Array [
-  1.75,
-  12.5,
+  Object {
+    "x": 1.5,
+    "y": 1.75,
+  },
+  Object {
+    "x": 5.5,
+    "y": 12.5,
+  },
 ]
 `;
 
@@ -48,8 +54,14 @@ Array [
 
 exports[`direct imports should have ASAP function 1`] = `
 Array [
-  5.5,
-  5.5,
+  Object {
+    "x": 1.5,
+    "y": 1.75,
+  },
+  Object {
+    "x": 5.5,
+    "y": 12.5,
+  },
 ]
 `;
 
@@ -94,8 +106,14 @@ Array [
 
 exports[`imports from root should have ASAP function 1`] = `
 Array [
-  1.75,
-  12.5,
+  Object {
+    "x": 1.5,
+    "y": 1.75,
+  },
+  Object {
+    "x": 5.5,
+    "y": 12.5,
+  },
 ]
 `;
 

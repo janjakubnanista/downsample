@@ -1,6 +1,6 @@
 import 'jest';
 import { NormalizedDataPoint } from './types';
-import { calculateAverageDataPoint, calculateSMA, calculateTriangleArea, splitIntoBuckets } from './utils';
+import { calculateAverageDataPoint, calculateTriangleArea, splitIntoBuckets } from './utils';
 
 describe('utils', () => {
   describe('calculateTriangleArea', () => {
@@ -91,47 +91,6 @@ describe('utils', () => {
       expect(splitIntoBuckets(data, 3)[0]).toEqual([[0, 2]]);
       expect(splitIntoBuckets(data, 3)[2]).toHaveLength(1);
       expect(splitIntoBuckets(data, 3)[2]).toEqual([[7, -1]]);
-    });
-  });
-
-  describe('calculateSMA', () => {
-    const data: number[] = [1, 1, 1, 3, 3, 3, 5, 5, 5];
-
-    it('should return the same array if window size and slide are both 1', () => {
-      expect(calculateSMA(data, 1, 1)).toEqual(data);
-    });
-
-    it('should return (N - window size + 1) data points', () => {
-      expect(calculateSMA(data, 2, 1)).toHaveLength(data.length - 1);
-      expect(calculateSMA(data, 4, 1)).toHaveLength(data.length - 3);
-      expect(calculateSMA(data, 5, 1)).toHaveLength(data.length - 4);
-    });
-
-    it('should return (N / slide [+ 1]) data points', () => {
-      const evenData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      const oddData = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-      expect(calculateSMA(evenData, 1, 2)).toHaveLength(5);
-      expect(calculateSMA(evenData, 1, 3)).toHaveLength(4);
-      expect(calculateSMA(evenData, 1, 4)).toHaveLength(3);
-      expect(calculateSMA(oddData, 1, 2)).toHaveLength(5);
-      expect(calculateSMA(oddData, 1, 3)).toHaveLength(3);
-      expect(calculateSMA(oddData, 1, 4)).toHaveLength(3);
-    });
-
-    it('should return okay numbers', () => {
-      const evenData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      const oddData = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-      expect(calculateSMA(data, 5, 1)).toMatchSnapshot();
-      expect(calculateSMA(data, 2, 1)).toMatchSnapshot();
-      expect(calculateSMA(data, 4, 1)).toMatchSnapshot();
-      expect(calculateSMA(evenData, 1, 2)).toMatchSnapshot();
-      expect(calculateSMA(evenData, 2, 3)).toMatchSnapshot();
-      expect(calculateSMA(evenData, 1, 4)).toMatchSnapshot();
-      expect(calculateSMA(oddData, 1, 2)).toMatchSnapshot();
-      expect(calculateSMA(oddData, 2, 3)).toMatchSnapshot();
-      expect(calculateSMA(oddData, 3, 4)).toMatchSnapshot();
     });
   });
 });

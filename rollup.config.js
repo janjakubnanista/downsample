@@ -1,5 +1,6 @@
 import commonJS from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
+import transformer from 'ts-type-checked/transformer';
 import ts from '@wessberg/rollup-plugin-ts';
 
 const configForFile = (fileName, displayName = fileName) => {
@@ -14,7 +15,18 @@ const configForFile = (fileName, displayName = fileName) => {
         name: displayName,
       },
     ],
-    plugins: [ts({ transpiler: 'babel' }), resolve(), commonJS({ ignoreGlobal: true })],
+    plugins: [
+      ts({
+        transpiler: 'babel',
+        transformers: [
+          ({ program }) => ({
+            before: transformer(program),
+          }),
+        ],
+      }),
+      resolve(),
+      commonJS({ ignoreGlobal: true }),
+    ],
   };
 };
 

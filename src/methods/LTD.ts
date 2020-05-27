@@ -1,6 +1,6 @@
-import { DataPoint, NormalizedDataPoint } from '../types';
+import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint, Value } from '../types';
 import { LTTBIndexesForBuckets } from './LTTB';
-import { normalizeDataPoints, splitIntoBuckets } from '../utils';
+import { createLegacyDataPointConfig, createNormalize, splitIntoBuckets } from '../utils';
 
 export const mergeBucketAt = (buckets: NormalizedDataPoint[][], index: number): NormalizedDataPoint[][] => {
   const bucketA: NormalizedDataPoint[] = buckets[index];
@@ -38,11 +38,11 @@ export const splitBucketAt = (buckets: NormalizedDataPoint[][], index: number): 
   return newBuckets;
 };
 
-export const calculateLinearRegressionCoefficients = (data: NormalizedDataPoint[]): [number, number] => {
+export const calculateLinearRegressionCoefficients = (data: NormalizedDataPoint[]): [Value, Value] => {
   const N: number = data.length;
 
-  let averageX = 0;
-  let averageY = 0;
+  let averageX: Value = 0;
+  let averageY: Value = 0;
   for (let i = 0; i < N; i++) {
     averageX += data[i][0];
     averageY += data[i][1];
@@ -132,83 +132,89 @@ export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse:
 };
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export function LTD<T extends DataPoint>(data: T[], desiredLength: number): T[] {
-  if (desiredLength < 0) {
-    throw new Error(`Supplied negative desiredLength parameter to LTD: ${desiredLength}`);
-  }
+export const createLTD = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
+  const normalize = createNormalize(config.x, config.y);
 
-  const { length } = data;
-  if (length <= 2 || length <= desiredLength) {
-    return data;
-  }
+  return (data: P[], desiredLength: number): P[] => {
+    if (desiredLength < 0) {
+      throw new Error(`Supplied negative desiredLength parameter to LTD: ${desiredLength}`);
+    }
 
-  // Now we are sure that:
-  //
-  // - length is [2, Infinity)
-  // - threshold is (length, Inifnity)
-  const normalizedData: NormalizedDataPoint[] = normalizeDataPoints(data);
+    const { length } = data;
+    if (length <= 2 || length <= desiredLength) {
+      return data;
+    }
 
-  // Require: data . The original data
-  // Require: threshold . Number of data points to be returned
-  // 1: Split the data into equal number of buckets as the threshold but have the first
-  // bucket only containing the first data point and the last bucket containing only
-  // the last data point . First and last buckets are then excluded in the bucket
-  // resizing
-  // 2: Calculate the SSE for the buckets accordingly . With one point in adjacent
-  // buckets overlapping
-  // 3: while halting condition is not met do . For example, using formula 4.2
-  // 4: Find the bucket F with the highest SSE
-  // 5: Find the pair of adjacent buckets A and B with the lowest SSE sum . The
-  // pair should not contain F
-  // 6: Split bucket F into roughly two equal buckets . If bucket F contains an odd
-  // number of points then one bucket will contain one more point than the other
-  // 7: Merge the buckets A and B
-  // 8: Calculate the SSE of the newly split up and merged buckets
-  // 9: end while.
-  // 10: Use the Largest-Triangle-Three-Buckets algorithm on the resulting bucket configuration
-  // to select one point per buckets
+    // Now we are sure that:
+    //
+    // - length is [2, Infinity)
+    // - threshold is (length, Inifnity)
+    const normalizedData: NormalizedDataPoint[] = normalize(data);
 
-  let buckets: NormalizedDataPoint[][] = splitIntoBuckets(normalizedData, desiredLength);
-  const numIterations = (length * 10) / desiredLength;
-  for (let iteration = 0; iteration < numIterations; iteration++) {
+    // Require: data . The original data
+    // Require: threshold . Number of data points to be returned
+    // 1: Split the data into equal number of buckets as the threshold but have the first
+    // bucket only containing the first data point and the last bucket containing only
+    // the last data point . First and last buckets are then excluded in the bucket
+    // resizing
     // 2: Calculate the SSE for the buckets accordingly . With one point in adjacent
     // buckets overlapping
-    const sseForBuckets: number[] = calculateSSEForBuckets(buckets);
-
+    // 3: while halting condition is not met do . For example, using formula 4.2
     // 4: Find the bucket F with the highest SSE
-    const highestSSEBucketIndex: number | undefined = findHighestSSEBucketIndex(buckets, sseForBuckets);
-    if (highestSSEBucketIndex === undefined) {
-      break;
-    }
-
     // 5: Find the pair of adjacent buckets A and B with the lowest SSE sum . The
     // pair should not contain F
-    const lowestSSEAdajacentBucketIndex: number | undefined = findLowestSSEAdjacentBucketsIndex(
-      sseForBuckets,
-      highestSSEBucketIndex,
-    );
-    if (lowestSSEAdajacentBucketIndex === undefined) {
-      break;
-    }
-
     // 6: Split bucket F into roughly two equal buckets . If bucket F contains an odd
     // number of points then one bucket will contain one more point than the other
-    buckets = splitBucketAt(buckets, highestSSEBucketIndex);
-
     // 7: Merge the buckets A and B
-    // If the lowest SSE index was after the highest index in the original
-    // unsplit array then we need to move it by one up since now the array has one more element
-    // before this index
-    buckets = mergeBucketAt(
-      buckets,
-      lowestSSEAdajacentBucketIndex > highestSSEBucketIndex
-        ? lowestSSEAdajacentBucketIndex + 1
-        : lowestSSEAdajacentBucketIndex,
-    );
-  }
+    // 8: Calculate the SSE of the newly split up and merged buckets
+    // 9: end while.
+    // 10: Use the Largest-Triangle-Three-Buckets algorithm on the resulting bucket configuration
+    // to select one point per buckets
 
-  const dataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
-  const dataPoints: T[] = dataPointIndexes.map<T>((index: number) => data[index]);
+    let buckets: NormalizedDataPoint[][] = splitIntoBuckets(normalizedData, desiredLength);
+    const numIterations = (length * 10) / desiredLength;
+    for (let iteration = 0; iteration < numIterations; iteration++) {
+      // 2: Calculate the SSE for the buckets accordingly . With one point in adjacent
+      // buckets overlapping
+      const sseForBuckets: number[] = calculateSSEForBuckets(buckets);
 
-  return dataPoints;
-}
+      // 4: Find the bucket F with the highest SSE
+      const highestSSEBucketIndex: number | undefined = findHighestSSEBucketIndex(buckets, sseForBuckets);
+      if (highestSSEBucketIndex === undefined) {
+        break;
+      }
+
+      // 5: Find the pair of adjacent buckets A and B with the lowest SSE sum . The
+      // pair should not contain F
+      const lowestSSEAdajacentBucketIndex: number | undefined = findLowestSSEAdjacentBucketsIndex(
+        sseForBuckets,
+        highestSSEBucketIndex,
+      );
+      if (lowestSSEAdajacentBucketIndex === undefined) {
+        break;
+      }
+
+      // 6: Split bucket F into roughly two equal buckets . If bucket F contains an odd
+      // number of points then one bucket will contain one more point than the other
+      buckets = splitBucketAt(buckets, highestSSEBucketIndex);
+
+      // 7: Merge the buckets A and B
+      // If the lowest SSE index was after the highest index in the original
+      // unsplit array then we need to move it by one up since now the array has one more element
+      // before this index
+      buckets = mergeBucketAt(
+        buckets,
+        lowestSSEAdajacentBucketIndex > highestSSEBucketIndex
+          ? lowestSSEAdajacentBucketIndex + 1
+          : lowestSSEAdajacentBucketIndex,
+      );
+    }
+
+    const dataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
+    const dataPoints: P[] = dataPointIndexes.map<P>((index: number) => data[index]);
+
+    return dataPoints;
+  };
+};
+
+export const LTD = createLTD(createLegacyDataPointConfig());

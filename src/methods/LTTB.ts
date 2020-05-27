@@ -1,5 +1,11 @@
-import { DataPoint, NormalizedDataPoint } from '../types';
-import { calculateAverageDataPoint, calculateTriangleArea, normalizeDataPoints, splitIntoBuckets } from '../utils';
+import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint } from '../types';
+import {
+  calculateAverageDataPoint,
+  calculateTriangleArea,
+  createLegacyDataPointConfig,
+  createNormalize,
+  splitIntoBuckets,
+} from '../utils';
 
 export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[] {
   const bucketCount: number = buckets.length;
@@ -37,20 +43,23 @@ export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[
 }
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export function LTTB<T extends DataPoint>(data: T[], desiredLength: number): T[] {
-  if (desiredLength < 0) {
-    throw new Error(`Supplied negative desiredLength parameter to LTTB: ${desiredLength}`);
-  }
+export const createLTTB = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
+  const normalize = createNormalize(config.x, config.y);
 
-  const { length } = data;
-  if (length <= 1 || length <= desiredLength) {
-    return data;
-  }
+  return (data: P[], desiredLength: number): P[] => {
+    if (desiredLength < 0) {
+      throw new Error(`Supplied negative desiredLength parameter to LTTB: ${desiredLength}`);
+    }
 
-  const normalizedData: NormalizedDataPoint[] = normalizeDataPoints(data);
-  const buckets: NormalizedDataPoint[][] = splitIntoBuckets(normalizedData, desiredLength);
-  const bucketDataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
-  const dataPoints: T[] = bucketDataPointIndexes.map<T>((index: number) => data[index]);
+    const { length } = data;
+    if (length <= 1 || length <= desiredLength) return data;
 
-  return dataPoints;
-}
+    const normalizedData: NormalizedDataPoint[] = normalize(data);
+    const buckets: NormalizedDataPoint[][] = splitIntoBuckets(normalizedData, desiredLength);
+    const bucketDataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
+
+    return bucketDataPointIndexes.map((index) => data[index]);
+  };
+};
+
+export const LTTB = createLTTB(createLegacyDataPointConfig());
