@@ -1,5 +1,5 @@
-import { DataPoint } from '../../types';
-import { SMA, SMANumeric } from '../SMA';
+import { DataPoint, DownsamplingFunction } from '../../types';
+import { SMA, SMANumeric, createSMA } from '../SMA';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
 import data from '../../../data/power.json';
 
@@ -55,26 +55,70 @@ describe('SMANumeric', () => {
 });
 
 describe('SMA', () => {
-  describe('with XYDataPoint with Date', () => testMethod(makeXYDateTestData(data)));
-  describe('with TupleDataPoint with Date', () => testMethod(makeTupleDateTestData(data)));
-  describe('with XYDataPoint with number', () => testMethod(makeXYNumberTestData(data)));
-  describe('with TupleDataPoint with number', () => testMethod(makeTupleNumberTestData(data)));
+  describe('with XYDataPoint with Date', () => testStuff(makeXYDateTestData(data), SMA));
+  describe('with TupleDataPoint with Date', () => testStuff(makeTupleDateTestData(data), SMA));
+  describe('with XYDataPoint with number', () => testStuff(makeXYNumberTestData(data), SMA));
+  describe('with TupleDataPoint with number', () => testStuff(makeTupleNumberTestData(data), SMA));
 
-  function testMethod(data: DataPoint[]) {
+  describe('createSMA', () => {
+    describe('with string / number x / y', () => {
+      describe('with XYDataPoint with number', () =>
+        testStuff(
+          makeXYNumberTestData(data),
+          createSMA({
+            x: 'x',
+            y: 'y',
+            toPoint: (x, y) => ({ x, y }),
+          }),
+        ));
+      describe('with TupleDataPoint with number', () =>
+        testStuff(
+          makeTupleNumberTestData(data),
+          createSMA({
+            x: 0,
+            y: 1,
+            toPoint: (x, y) => [x, y],
+          }),
+        ));
+    });
+
+    describe('with function x / y', () => {
+      describe('with XYDataPoint with Date', () =>
+        testStuff(
+          makeXYDateTestData(data),
+          createSMA({
+            x: (value) => value.x.getTime(),
+            y: 'y',
+            toPoint: (x, y) => ({ x: new Date(x), y }),
+          }),
+        ));
+      describe('with TupleDataPoint with Date', () =>
+        testStuff(
+          makeTupleDateTestData(data),
+          createSMA({
+            x: (value) => value[0].getTime(),
+            y: 1,
+            toPoint: (x, y) => [new Date(x), y] as [Date, number],
+          }),
+        ));
+    });
+  });
+
+  function testStuff<T>(data: T[], method: DownsamplingFunction<T, [number, number]>): void {
     it('should return the same length array if window size and slide are both 1', () => {
-      expect(SMA(data, 1, 1)).toHaveLength(data.length);
+      expect(method(data, 1, 1)).toHaveLength(data.length);
     });
 
     it('should return (N - window size + 1) data points', () => {
-      expect(SMA(data, 2, 1)).toHaveLength(data.length - 1);
-      expect(SMA(data, 50, 1)).toHaveLength(data.length - 49);
+      expect(method(data, 2, 1)).toHaveLength(data.length - 1);
+      expect(method(data, 50, 1)).toHaveLength(data.length - 49);
     });
 
     it('should smooth correctly', () => {
-      expect(SMA(data, 5, 1)).toMatchSnapshot();
-      expect(SMA(data, 100, 100)).toMatchSnapshot();
-      expect(SMA(data, 1000, 1000)).toMatchSnapshot();
-      expect(SMA(data, 1000, 3)).toMatchSnapshot();
+      expect(method(data, 5, 1)).toMatchSnapshot();
+      expect(method(data, 100, 100)).toMatchSnapshot();
+      expect(method(data, 1000, 1000)).toMatchSnapshot();
+      expect(method(data, 1000, 3)).toMatchSnapshot();
     });
   }
 });
