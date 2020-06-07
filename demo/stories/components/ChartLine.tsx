@@ -3,7 +3,7 @@ import React from 'react';
 
 export interface ChartLineProps {
   color: string;
-  data?: object[];
+  data?: object[]; // eslint-disable-line
   dataKey: string;
   title: string;
 }
