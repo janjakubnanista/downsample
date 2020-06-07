@@ -1,15 +1,15 @@
 export * from './types';
 
-import { ASAP } from './methods/ASAP';
-import { LTD } from './methods/LTD';
-import { LTOB } from './methods/LTOB';
-import { LTTB } from './methods/LTTB';
-import { SMA } from './methods/SMA';
+import { ASAP, createASAP } from './methods/ASAP';
+import { LTD, createLTD } from './methods/LTD';
+import { LTOB, createLTOB } from './methods/LTOB';
+import { LTTB, createLTTB } from './methods/LTTB';
+import { SMA, createSMA } from './methods/SMA';
 
-export { ASAP } from './methods/ASAP';
-export { LTD } from './methods/LTD';
-export { LTOB } from './methods/LTOB';
-export { LTTB } from './methods/LTTB';
-export { SMA } from './methods/SMA';
+export { ASAP, createASAP } from './methods/ASAP';
+export { LTD, createLTD } from './methods/LTD';
+export { LTOB, createLTOB } from './methods/LTOB';
+export { LTTB, createLTTB } from './methods/LTTB';
+export { SMA, createSMA } from './methods/SMA';
 
-export default { ASAP, LTD, LTOB, LTTB, SMA };
+export default { ASAP, LTD, LTOB, LTTB, SMA, createASAP, createLTD, createLTOB, createLTTB, createSMA };

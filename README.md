@@ -63,14 +63,15 @@ You can read more about the details of these in the [API](#api) section below.
 <a id="api"></a>
 ## API
 
+<a id="api/ASAP"></a>
 ### `ASAP` :boom: *new in 1.2.0* :boom:
 
 Automatic Smoothing for Attention Prioritization ([read more here](http://futuredata.stanford.edu/asap/)) is a smoothing rather than downsampling method - it will remove the short-term noise and reveal the large-scale deviations.
 
-`ASAP` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments.
+`ASAP` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments. It will always return the points in `XYDataPoint` format. [See advanced API if you need to work with a custom data type](#api/createASAP).
 
 ```typescript
-function ASAP(data: DataPoint[], targetResolution: number): number[]
+function ASAP(data: DataPoint[], targetResolution: number): XYDataPoint[]
 ```
 
 ```typescript
@@ -87,14 +88,15 @@ const smooth = ASAP([
 ], chartWidth);
 ```
 
+<a id="api/SMA"></a>
 ### `SMA` :boom: *new in 1.2.0* :boom:
 
 Simple moving average with variable slide ([read more here](https://en.wikipedia.org/wiki/Moving_average#Simple_moving_average)).
 
-`SMA` accepts an array of data points (see [DataPoint](#api/DataPoint)), size of a window over which to calculate average and a slide - an amount by which the window is shifted.
+`SMA` accepts an array of data points (see [DataPoint](#api/DataPoint)), size of a window over which to calculate average and a slide - an amount by which the window is shifted. It will always return the points in `XYDataPoint` format. [See advanced API if you need to work with a custom data type](#api/createSMA).
 
 ```typescript
-function SMA(data: DataPoint[], windowSize: number, slide?: number = 1): number[]
+function SMA(data: DataPoint[], windowSize: number, slide?: number = 1): XYDataPoint[]
 ```
 
 ```typescript
@@ -111,15 +113,16 @@ const smooth = SMA([
 ], chartWidth);
 ```
 
+<a id="api/LTTB"></a>
 ### `LTTB`
 
-Largest triangle three buckets ([read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)). If you are looking for the best performing method then look no more!
+Largest triangle three buckets ([read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)). If you are looking for the best performing downsampling method then look no more!
 
 ```typescript
 function LTTB(data: DataPoint[], targetResolution: number): DataPoint[]
 ```
 
-`LTTB` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments.
+`LTTB` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTTB).
 
 The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
 
@@ -137,6 +140,7 @@ const downsampled = LTTB([
 ], chartWidth);
 ```
 
+<a id="api/LTOB"></a>
 ### `LTOB`
 
 Largest triangle one bucket ([read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)). Performs only slightly worse than LTTB.
@@ -145,7 +149,7 @@ Largest triangle one bucket ([read more here](https://skemman.is/bitstream/1946/
 function LTOB(data: DataPoint[], targetResolution: number): DataPoint[]
 ```
 
-`LTOB` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments.
+`LTOB` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTOB).
 
 The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
 
@@ -163,6 +167,7 @@ const downsampled = LTOB([
 ], chartWidth);
 ```
 
+<a id="api/LTD"></a>
 ### `LTD`
 
 Largest triangle dynamic ([read more here](https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf)). The simplest downsampling method.
@@ -171,7 +176,7 @@ Largest triangle dynamic ([read more here](https://skemman.is/bitstream/1946/153
 function LTD(data: DataPoint[], targetResolution: number): DataPoint[]
 ```
 
-`LTD` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments.
+`LTD` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTD).
 
 The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
 
@@ -200,6 +205,72 @@ type DataPoint =
   [Date, number] | 
   { x: number; y: number } |
   { x: Date; y: number } |
+```
+
+## Advanced API
+
+All the functions above work with `DataPoint` objects as a reasonable default. If however this does not fit your needs you can create your own version of a function using a downsampling function factory.
+
+<a id="api/createASAP"></a>
+### `createASAP`
+
+Creates an [ASAP](#api/ASAP) smoothing function for a specific point data type `P`.
+
+```typescript
+function createASAP({
+  x: string | number | (point: P) => number,
+  y: string | number | (point: P) => number,
+  toPoint: (x: number, y: number) => P
+}): ASAP;
+```
+
+<a id="api/createSMA"></a>
+### `createSMA`
+
+Creates a [SMA](#api/SMA) smoothing function for a specific point data type `P`.
+
+```typescript
+function createSMA({
+  x: string | number | (point: P) => number,
+  y: string | number | (point: P) => number,
+  toPoint: (x: number, y: number) => P
+}): SMA;
+```
+
+<a id="api/createLTD"></a>
+### `createLTD`
+
+Creates an [LTD](#api/LTD) downsampling function for a specific point data type `P`.
+
+```typescript
+function createLTD({
+  x: string | number | (point: P) => number,
+  y: string | number | (point: P) => number
+}): LTD;
+```
+
+<a id="api/createLTOB"></a>
+### `createLTOB`
+
+Creates an [LTOB](#api/LTOB) downsampling function for a specific point data type `P`.
+
+```typescript
+function createLTOB({
+  x: string | number | (point: P) => number,
+  y: string | number | (point: P) => number
+}): LTOB;
+```
+
+<a id="api/createLTTB"></a>
+### `createLTTB`
+
+Creates an [LTTB](#api/LTTB) downsampling function for a specific point data type `P`.
+
+```typescript
+function createLTTB({
+  x: string | number | (point: P) => number,
+  y: string | number | (point: P) => number
+}): LTTB;
 ```
 
 <a id="demo"></a>
