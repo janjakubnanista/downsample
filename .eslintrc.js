@@ -35,7 +35,7 @@ module.exports = {
     {
       files: ['test/**.spec.ts'],
       rules: {
-        '@typescript-eslint/ban-ts-ignore': 1,
+        '@typescript-eslint/ban-ts-comment': 1,
       },
     },
   ],
