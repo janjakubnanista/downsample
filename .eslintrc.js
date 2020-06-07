@@ -57,14 +57,6 @@ module.exports = {
       },
     ],
 
-    // A special case in which to ignore camelcase found in rollup.config.js
-    '@typescript-eslint/camelcase': [
-      1,
-      {
-        allow: ['screw_ie8'],
-      },
-    ],
-
     '@typescript-eslint/no-use-before-define': [2, { functions: false, classes: false }],
 
     '@typescript-eslint/explicit-function-return-type': 0,
