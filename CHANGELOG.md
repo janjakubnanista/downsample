@@ -15,3 +15,9 @@
 ## 1.2.0
 
 - `ASAP` and `SMA` methods
+
+## 1.3.0
+
+- Added missing `SMA` export
+- Added downampling function factories (`createASAP`, `createLTD` etc.)
+- Fixed a typo in API docs
