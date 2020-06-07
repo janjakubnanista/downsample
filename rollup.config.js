@@ -36,4 +36,5 @@ export default [
   configForFile('methods/LTD'),
   configForFile('methods/LTOB'),
   configForFile('methods/LTTB'),
+  configForFile('methods/SMA'),
 ];
