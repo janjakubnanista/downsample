@@ -1,4 +1,4 @@
-import { DownsamplingFunction, SmoothingFunctionConfig } from '../types';
+import { ArrayDownsamplingFunction, SmoothingFunctionConfig } from '../types';
 import { createLegacyDataPointConfig, getPointValueExtractor } from '../utils';
 
 export const SMANumeric = (data: number[], windowSize: number, slide = 1): number[] => {
@@ -29,7 +29,7 @@ export const SMANumeric = (data: number[], windowSize: number, slide = 1): numbe
  */
 export const createSMA = <T>(
   config: SmoothingFunctionConfig<T>,
-): DownsamplingFunction<T, [number, number | undefined] | [number]> => {
+): ArrayDownsamplingFunction<T, [number, number | undefined] | [number]> => {
   const timeExtractor = getPointValueExtractor(config.x);
   const valueExtractor = getPointValueExtractor(config.y);
   const pointFactory = config.toPoint;
@@ -55,7 +55,7 @@ export const createSMA = <T>(
       sum += data[i] - data[i - windowSize];
     }
 
-    return output;
+    return output.constructor === values.constructor ? output : new (values.constructor as any)(output);
   };
 };
 

@@ -1,4 +1,4 @@
-import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint, Value } from '../types';
+import { ArrayDownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint, Value } from '../types';
 import { LTTBIndexesForBuckets } from './LTTB';
 import { createLegacyDataPointConfig, createNormalize, splitIntoBuckets } from '../utils';
 
@@ -132,7 +132,7 @@ export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse:
 };
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export const createLTD = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
+export const createLTD = <P>(config: DownsamplingFunctionConfig<P>): ArrayDownsamplingFunction<P, [number]> => {
   const normalize = createNormalize(config.x, config.y);
 
   return (data: P[], desiredLength: number): P[] => {

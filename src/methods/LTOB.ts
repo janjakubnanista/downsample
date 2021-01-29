@@ -1,8 +1,8 @@
-import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint } from '../types';
+import { ArrayDownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint } from '../types';
 import { calculateTriangleArea, createLegacyDataPointConfig, createNormalize } from '../utils';
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export const createLTOB = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
+export const createLTOB = <P>(config: DownsamplingFunctionConfig<P>): ArrayDownsamplingFunction<P, [number]> => {
   const normalize = createNormalize(config.x, config.y);
 
   return (data: P[], desiredLength: number): P[] => {

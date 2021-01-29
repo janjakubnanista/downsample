@@ -1,4 +1,4 @@
-import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint } from '../types';
+import { ArrayDownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint } from '../types';
 import {
   calculateAverageDataPoint,
   calculateTriangleArea,
@@ -43,7 +43,7 @@ export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[
 }
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export const createLTTB = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
+export const createLTTB = <P>(config: DownsamplingFunctionConfig<P>): ArrayDownsamplingFunction<P, [number]> => {
   const normalize = createNormalize(config.x, config.y);
 
   return (data: P[], desiredLength: number): P[] => {

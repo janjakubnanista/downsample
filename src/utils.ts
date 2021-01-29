@@ -94,7 +94,7 @@ export const createNormalize = <P>(
   const getX = getPointValueExtractor(x);
   const getY = getPointValueExtractor(y);
 
-  return (data: P[]): NormalizedDataPoint[] => data.map((point) => [getX(point), getY(point)]);
+  return (data: P[]): NormalizedDataPoint[] => data.map((point, index) => [getX(point, index), getY(point, index)]);
 };
 
 export const createXYDataPoint = (time: number, value: number): XYDataPoint => ({ x: time, y: value });

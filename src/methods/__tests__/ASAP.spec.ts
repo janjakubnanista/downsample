@@ -1,6 +1,6 @@
 import 'jest';
-import { ASAP, createASAP } from '../ASAP';
-import { DownsamplingFunction } from '../../types';
+import { ASAP, createASAP, createTypedASAP } from '../ASAP';
+import { ArrayDownsamplingFunction, SmoothingFunctionConfig } from '../../types';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
 import data from '../../../data/power.json';
 
@@ -73,7 +73,44 @@ describe('ASAP', () => {
     });
   });
 
-  function testStuff<T>(data: T[], method: DownsamplingFunction<T, [number]>): void {
+  describe('createTypedASAP', () => {
+    it('should return correct typed array type back', () => {
+      const config: SmoothingFunctionConfig<number> = {
+        x: (value: number) => value,
+        y: (value: number, index: number) => index,
+        toPoint: (x, y) => y,
+      };
+
+      const arrayData: Array<number> = Array.from([0, 1, 2, 4]);
+      expect(createASAP(config)(arrayData, 1)).toBeInstanceOf(Array);
+
+      const uint8Data: Uint8Array = Uint8Array.from([0, 1, 2, 4]);
+      expect(createTypedASAP(config)(uint8Data, 1)).toBeInstanceOf(Uint8Array);
+
+      const uint16Data: Uint16Array = Uint16Array.from([0, 1, 2, 4]);
+      expect(createTypedASAP(config)(uint16Data, 1)).toBeInstanceOf(Uint16Array);
+
+      const uint32Data: Uint32Array = Uint32Array.from([0, 1, 2, 4]);
+      expect(createTypedASAP(config)(uint32Data, 1)).toBeInstanceOf(Uint32Array);
+
+      const int8Data: Int8Array = Int8Array.from([0, 1, 2, 4]);
+      expect(createTypedASAP(config)(int8Data, 1)).toBeInstanceOf(Int8Array);
+
+      const int16Data: Int16Array = Int16Array.from([0, 1, 2, 4]);
+      expect(createTypedASAP(config)(int16Data, 1)).toBeInstanceOf(Int16Array);
+
+      const int32Data: Int32Array = Int32Array.from([0, 1, 2, 4]);
+      expect(createTypedASAP(config)(int32Data, 1)).toBeInstanceOf(Int32Array);
+
+      const float32Data: Float32Array = Float32Array.from([0, 1, 2, 4]);
+      expect(createTypedASAP(config)(float32Data, 1)).toBeInstanceOf(Float32Array);
+
+      const float64Data: Float64Array = Float64Array.from([0, 1, 2, 4]);
+      expect(createTypedASAP(config)(float64Data, 1)).toBeInstanceOf(Float64Array);
+    });
+  });
+
+  function testStuff<T>(data: T[], method: ArrayDownsamplingFunction<T, [number]>): void {
     it('should throw an error if desiredLength is negative', () => {
       expect(() => method(data, -1)).toThrow();
     });

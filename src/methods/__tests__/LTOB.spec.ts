@@ -1,5 +1,5 @@
 import 'jest';
-import { DownsamplingFunction } from '../../types';
+import { ArrayDownsamplingFunction } from '../../types';
 import { LTOB, createLTOB } from '../LTOB';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
 import data from '../../../data/power.json';
@@ -50,7 +50,7 @@ describe('LTOB', () => {
     });
   });
 
-  function testStuff<T>(data: T[], method: DownsamplingFunction<T, [number]>): void {
+  function testStuff<T>(data: T[], method: ArrayDownsamplingFunction<T, [number]>): void {
     it('should throw an error if desiredLength is negative', () => {
       expect(() => method(data, -1)).toThrow();
     });

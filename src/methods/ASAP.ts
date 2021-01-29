@@ -1,4 +1,9 @@
-import { DownsamplingFunction, SmoothingFunctionConfig } from '../types';
+import {
+  ArrayDownsamplingFunction,
+  SmoothingFunctionConfig,
+  TypedArray,
+  TypedArrayDownsamplingFunction,
+} from '../types';
 import { SMANumeric, createSMA } from './SMA';
 import { calculateMean, calculateSTD, createLegacyDataPointConfig, getPointValueExtractor } from '../utils';
 import { fft, inverseFFT } from '../fft';
@@ -145,7 +150,7 @@ const calculateAutocorrelation = (values: number[], maxLag: number): Autocorrela
   return { correlations, peaks, maxCorrelation };
 };
 
-export const createASAP = <T>(config: SmoothingFunctionConfig<T>): DownsamplingFunction<T, [number]> => {
+export function createASAP<T>(config: SmoothingFunctionConfig<T>): ArrayDownsamplingFunction<T, [number]> {
   const valueExtractor = getPointValueExtractor(config.y);
   const SMA = createSMA(config);
 
@@ -208,6 +213,12 @@ export const createASAP = <T>(config: SmoothingFunctionConfig<T>): DownsamplingF
 
     return SMA(values, windowSize, 1);
   };
+}
+
+export const createTypedASAP = <T extends TypedArray>(
+  config: SmoothingFunctionConfig<number>,
+): TypedArrayDownsamplingFunction<T, [number]> => {
+  return createASAP(config) as any;
 };
 
 export const ASAP = createASAP(createLegacyDataPointConfig());
