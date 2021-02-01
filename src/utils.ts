@@ -1,9 +1,11 @@
 import {
+  ArrayLike,
   DataPoint,
   NormalizedDataPoint,
   NumericPropertyAccessor,
   PointValueExtractor,
   SmoothingFunctionConfig,
+  TypedArray,
   XYDataPoint,
 } from './types';
 import { isA } from 'ts-type-checked';
@@ -94,7 +96,7 @@ export const createNormalize = <P>(
   const getX = getPointValueExtractor(x);
   const getY = getPointValueExtractor(y);
 
-  return (data: P[]): NormalizedDataPoint[] => data.map((point, index) => [getX(point, index), getY(point, index)]);
+  return (data: ArrayLike<P> | TypedArray): NormalizedDataPoint[] => data.map((point: P, index: number) => [getX(point, index), getY(point, index)]);
 };
 
 export const createXYDataPoint = (time: number, value: number): XYDataPoint => ({ x: time, y: value });
@@ -108,3 +110,18 @@ export const createLegacyDataPointConfig = (): SmoothingFunctionConfig<DataPoint
   y: (point: DataPoint) => ('y' in point ? point.y : point[1]),
   toPoint: createXYDataPoint,
 });
+
+export const emptyArray = <T extends ArrayLike<unknown> = ArrayLike<unknown>>(originalArray: T): T => {
+  if (typeof originalArray.constructor !== 'function')
+    throw new Error(`Cannot create an empty array based on '${originalArray}': constructor property is not callable`);
+
+  return new (originalArray.constructor as any)();
+};
+
+export const arrayAs = <E, T extends ArrayLike<E> = ArrayLike<E>>(data: Array<E>, template: T): T => {
+  if (template.constructor === data.constructor) return (data as unknown) as T;
+  if (typeof template.constructor !== 'function')
+    throw new Error(`Cannot create an array based on '${template}': constructor property is not callable`);
+
+  return new (template.constructor as any)(data);
+};

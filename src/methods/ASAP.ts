@@ -1,11 +1,12 @@
 import {
-  ArrayDownsamplingFunction,
+  DownsamplingFunction,
+  ArrayLike,
+  DataPoint,
   SmoothingFunctionConfig,
   TypedArray,
-  TypedArrayDownsamplingFunction,
 } from '../types';
 import { SMANumeric, createSMA } from './SMA';
-import { calculateMean, calculateSTD, createLegacyDataPointConfig, getPointValueExtractor } from '../utils';
+import { calculateMean, calculateSTD, createLegacyDataPointConfig, emptyArray, getPointValueExtractor } from '../utils';
 import { fft, inverseFFT } from '../fft';
 
 const calculateDiffs = (values: number[]): number[] => {
@@ -150,12 +151,14 @@ const calculateAutocorrelation = (values: number[], maxLag: number): Autocorrela
   return { correlations, peaks, maxCorrelation };
 };
 
-export function createASAP<T>(config: SmoothingFunctionConfig<T>): ArrayDownsamplingFunction<T, [number]> {
+export function createASAP<InputDataPoint, InputArray extends ArrayLike<InputDataPoint>>(
+  config: SmoothingFunctionConfig<InputDataPoint>,
+): DownsamplingFunction<InputDataPoint, [number], InputArray> {
   const valueExtractor = getPointValueExtractor(config.y);
   const SMA = createSMA(config);
 
-  return function ASAP(values, resolution): T[] {
-    if (values.length === 0) return [];
+  return function ASAP(values, resolution): InputArray {
+    if (values.length === 0) return emptyArray(values);
     if (resolution <= 0) {
       throw new Error(`Supplied non-positive resolution parameter to ASAP: ${resolution}`);
     }
@@ -217,8 +220,8 @@ export function createASAP<T>(config: SmoothingFunctionConfig<T>): ArrayDownsamp
 
 export const createTypedASAP = <T extends TypedArray>(
   config: SmoothingFunctionConfig<number>,
-): TypedArrayDownsamplingFunction<T, [number]> => {
-  return createASAP(config) as any;
+): DownsamplingFunction<number, [number], T> => {
+  return createASAP(config);
 };
 
-export const ASAP = createASAP(createLegacyDataPointConfig());
+export const ASAP = createASAP<DataPoint, DataPoint[]>(createLegacyDataPointConfig());

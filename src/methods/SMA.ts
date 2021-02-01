@@ -1,7 +1,7 @@
-import { ArrayDownsamplingFunction, SmoothingFunctionConfig } from '../types';
-import { createLegacyDataPointConfig, getPointValueExtractor } from '../utils';
+import { DownsamplingFunction, ArrayLike, SmoothingFunctionConfig, ArrayType } from '../types';
+import { arrayAs, createLegacyDataPointConfig, emptyArray, getPointValueExtractor } from '../utils';
 
-export const SMANumeric = (data: number[], windowSize: number, slide = 1): number[] => {
+export const SMANumeric = <T extends ArrayLike<number>>(data: T, windowSize: number, slide = 1): T => {
   const output: number[] = [];
   let sum = 0;
 
@@ -17,7 +17,7 @@ export const SMANumeric = (data: number[], windowSize: number, slide = 1): numbe
     sum += data[i] - data[i - windowSize];
   }
 
-  return output;
+  return arrayAs(output, data);
 };
 
 /**
@@ -27,20 +27,20 @@ export const SMANumeric = (data: number[], windowSize: number, slide = 1): numbe
  * @param windowSize {Number}
  * @param slide {Number}
  */
-export const createSMA = <T>(
-  config: SmoothingFunctionConfig<T>,
-): ArrayDownsamplingFunction<T, [number, number | undefined] | [number]> => {
+export const createSMA = <InputDataPoint, InputArray extends ArrayType<InputDataPoint> = ArrayLike<InputDataPoint>>(
+  config: SmoothingFunctionConfig<InputDataPoint>,
+): DownsamplingFunction<InputDataPoint, [number, number | undefined] | [number], InputArray> => {
   const timeExtractor = getPointValueExtractor(config.x);
   const valueExtractor = getPointValueExtractor(config.y);
   const pointFactory = config.toPoint;
 
-  return (values, windowSize, slide = 1): T[] => {
-    if (values.length === 0) return [];
+  return (values, windowSize, slide = 1): InputArray => {
+    if (values.length === 0) return values;
     // if (windowSize === 1 && slide === 1) return values.slice();
 
-    const data: number[] = values.map(valueExtractor);
-    const times: number[] = values.map(timeExtractor);
-    const output: T[] = [];
+    const data: ArrayLike<number> = values.map(valueExtractor);
+    const times: ArrayLike<number> = values.map(timeExtractor);
+    const output: InputDataPoint[] = [];
     let sum = 0;
 
     for (let i = 0; i < windowSize; i++) {
@@ -55,7 +55,7 @@ export const createSMA = <T>(
       sum += data[i] - data[i - windowSize];
     }
 
-    return output.constructor === values.constructor ? output : new (values.constructor as any)(output);
+    return arrayAs(data, values);
   };
 };
 

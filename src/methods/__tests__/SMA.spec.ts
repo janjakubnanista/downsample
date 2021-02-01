@@ -1,4 +1,4 @@
-import { ArrayDownsamplingFunction, DataPoint } from '../../types';
+import { DownsamplingFunction, DataPoint } from '../../types';
 import { SMA, SMANumeric, createSMA } from '../SMA';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
 import data from '../../../data/power.json';
@@ -104,7 +104,7 @@ describe('SMA', () => {
     });
   });
 
-  function testStuff<T>(data: T[], method: ArrayDownsamplingFunction<T, [number, number]>): void {
+  function testStuff<T>(data: T[], method: DownsamplingFunction<T, [number, number]>): void {
     it('should return the same length array if window size and slide are both 1', () => {
       expect(method(data, 1, 1)).toHaveLength(data.length);
     });

@@ -1,6 +1,6 @@
-import { ArrayDownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint, Value } from '../types';
+import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint, Value } from '../types';
 import { LTTBIndexesForBuckets } from './LTTB';
-import { createLegacyDataPointConfig, createNormalize, splitIntoBuckets } from '../utils';
+import { arrayAs, createLegacyDataPointConfig, createNormalize, splitIntoBuckets } from '../utils';
 
 export const mergeBucketAt = (buckets: NormalizedDataPoint[][], index: number): NormalizedDataPoint[][] => {
   const bucketA: NormalizedDataPoint[] = buckets[index];
@@ -132,10 +132,10 @@ export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse:
 };
 
 // Largest triangle three buckets data downsampling algorithm implementation
-export const createLTD = <P>(config: DownsamplingFunctionConfig<P>): ArrayDownsamplingFunction<P, [number]> => {
+export const createLTD = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
   const normalize = createNormalize(config.x, config.y);
 
-  return (data: P[], desiredLength: number): P[] => {
+  return (data, desiredLength: number) => {
     if (desiredLength < 0) {
       throw new Error(`Supplied negative desiredLength parameter to LTD: ${desiredLength}`);
     }
@@ -213,7 +213,7 @@ export const createLTD = <P>(config: DownsamplingFunctionConfig<P>): ArrayDownsa
     const dataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
     const dataPoints: P[] = dataPointIndexes.map<P>((index: number) => data[index]);
 
-    return dataPoints;
+    return arrayAs(dataPoints, data);
   };
 };
 
