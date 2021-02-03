@@ -70,14 +70,6 @@ export const calculateSTD = (values: number[]): number => {
   return Math.sqrt(std / values.length);
 };
 
-export const getPointValueExtractor = <P>(
-  accessor: NumericPropertyAccessor<P> | PointValueExtractor<P>,
-): PointValueExtractor<P> => {
-  if (isA<PointValueExtractor<unknown>>(accessor)) return accessor;
-
-  return (point: P) => (point as any)[accessor];
-};
-
 // export const createNormalize = <P>(
 //   x: NumericPropertyAccessor<P> | PointValueExtractor<P>,
 //   y: NumericPropertyAccessor<P> | PointValueExtractor<P>,
@@ -88,14 +80,14 @@ export const getPointValueExtractor = <P>(
 //   return (data: PossibleArray<P>): NormalizedDataPoint[] => data.map((point: P, index: number) => [getX(point, index), getY(point, index)]);
 // };
 
-export const createXYDataPoint = (time: number, value: number): XYDataPoint => ({ x: time, y: value });
+// export const createXYDataPoint = (time: number, value: number): XYDataPoint => ({ x: time, y: value });
 
-export const createLegacyDataPointConfig = (): SmoothingFunctionConfig<DataPoint> => ({
-  x: (point: DataPoint) => {
-    const t = isA<XYDataPoint>(point) ? point.x : point[0];
+// export const createLegacyDataPointConfig = (): SmoothingFunctionConfig<DataPoint> => ({
+//   x: (point: DataPoint) => {
+//     const t = isA<XYDataPoint>(point) ? point.x : point[0];
 
-    return isA<Date>(t) ? t.getTime() : t;
-  },
-  y: (point: DataPoint) => ('y' in point ? point.y : point[1]),
-  toPoint: createXYDataPoint,
-});
+//     return isA<Date>(t) ? t.getTime() : t;
+//   },
+//   y: (point: DataPoint) => ('y' in point ? point.y : point[1]),
+//   toPoint: createXYDataPoint,
+// });
