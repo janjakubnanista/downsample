@@ -44,8 +44,8 @@ export const calculateLinearRegressionCoefficients = (data: NormalizedDataPoint[
   let averageX: Value = 0;
   let averageY: Value = 0;
   for (let i = 0; i < N; i++) {
-    averageX += data[i][0];
-    averageY += data[i][1];
+    averageX += data[i].x;
+    averageY += data[i].y;
   }
 
   averageX /= N;
@@ -54,7 +54,7 @@ export const calculateLinearRegressionCoefficients = (data: NormalizedDataPoint[
   let aNumerator = 0;
   let aDenominator = 0;
   for (let i = 0; i < N; i++) {
-    const [x, y]: NormalizedDataPoint = data[i];
+    const { x, y }: NormalizedDataPoint = data[i];
     aNumerator += (x - averageX) * (y - averageY);
     aDenominator += (x - averageX) * (x - averageX);
   }
@@ -71,7 +71,7 @@ export const calculateSSEForBucket = (dataPoints: NormalizedDataPoint[]): number
   let sumStandardErrorsSquared = 0;
   for (let i = 0; i < dataPoints.length; i++) {
     const dataPoint: NormalizedDataPoint = dataPoints[i];
-    const standardError: number = dataPoint[1] - (a * dataPoint[0] + b);
+    const standardError: number = dataPoint.y - (a * dataPoint.x + b);
 
     sumStandardErrorsSquared += standardError * standardError;
   }
