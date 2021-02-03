@@ -38,7 +38,6 @@ export interface SmoothingFunctionConfig<P> extends DownsamplingFunctionConfig<P
   toPoint: (x: number, y: number, index: number) => P;
 }
 
-export type AllowedElement<A> = A extends TypedArray ? number : A extends Array<infer E> ? E : A extends ReadonlyArray<infer E> ? E : never;
 export type TypedArray =
   | Int8Array
   | Int16Array
@@ -49,9 +48,19 @@ export type TypedArray =
   | Uint32Array
   | Float32Array
   | Float64Array;
-export type ArrayType<T = unknown> = Array<T> | ReadonlyArray<T> | TypedArray;
 
-export type DownsamplingFunction<InputArray extends ArrayType, Params extends Array<unknown> = [], OutputArray extends ArrayType = InputArray> = (input: InputArray, ...args: Params) => OutputArray;
+export type AllowedArray<Point> = Point extends number ? TypedArray | Point[] : Point[];
+
+export type DownsamplingFunction<Point, Params extends unknown[] = [], OutputPoint = Point> = <
+  InputArray extends AllowedArray<Point>,
+  OutputArray extends AllowedArray<OutputPoint>
+>(
+  data: InputArray,
+  ...params: Params
+) => OutputArray;
+// export type ArrayType<T = unknown> = Array<T> | ReadonlyArray<T> | TypedArray;
+
+// export type DownsamplingFunction<InputArray extends ArrayType, Params extends Array<unknown> = [], OutputArray extends ArrayType = InputArray> = (input: InputArray, ...args: Params) => OutputArray;
 
 // 1. Sampling function receives a getter: get(int index) => number value
 // 2. Sampling function receives an optional output formatter: format(int index, number value) => unknown value
@@ -78,7 +87,7 @@ export type DownsamplingFunction<InputArray extends ArrayType, Params extends Ar
 
 // export type ArrayLike<P> = Array<P> | ReadonlyArray<P>;
 export type ArrayLike<P> = Array<P>;
-type PossibleArray<P> = P extends number ? ArrayLike<P> | TypedArray : ArrayLike<P>;
+export type PossibleArray<P> = P extends number ? ArrayLike<P> | TypedArray : ArrayLike<P>;
 // export type DownsamplingFunction<P, Params extends Array<unknown> = [], PA extends PossibleArray<P> = PossibleArray<P>, OA extends ArrayLike<unknown> | TypedArray = PA> = (input: PA, ...args: Params) => OA;
 
 // export type ArrayLike<InputDataPoint> = Array<InputDataPoint> | TypedArray;
@@ -96,3 +105,22 @@ type PossibleArray<P> = P extends number ? ArrayLike<P> | TypedArray : ArrayLike
 
 // export type DownsamplingFunction<E, P extends unknown[], I extends ArrayType<E> = ArrayType<E>, O = I> = (data: ArrayType<I>, ...Params: P) => O[];
 // export type DownsamplingFunction<InputDataPoint, P extends unknown[], OutputDataPoint = InputDataPoint, InputArray extends ArrayType<InputDataPoint> = ArrayType<InputDataPoint>, OutputArray extends ArrayType<OutputDataPoint> = InputArray> = (data: ArrayType<InputDataPoint>, ...Params: P) => ArrayType<OutputDataPoint>;
+
+//
+//
+// Types V2//
+//
+//
+
+// // namespace V2 {
+//   export type DownsamplingFunction<
+//     // Type of iterable element
+//     E,
+//     // Types for additional function arguments
+//     Params extends unknown[],
+//     // Type of the input iterable
+//     I extends PossibleArray<E> = PossibleArray<E>,
+//     // Type of the output
+//     O = I
+//   > = (data: I, ...params: Params) => O;
+// // }

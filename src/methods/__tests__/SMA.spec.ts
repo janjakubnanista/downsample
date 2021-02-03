@@ -1,4 +1,4 @@
-import { DownsamplingFunction, DataPoint } from '../../types';
+import { DataPoint, DownsamplingFunction } from '../../types';
 import { SMA, SMANumeric, createSMA } from '../SMA';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
 import data from '../../../data/power.json';

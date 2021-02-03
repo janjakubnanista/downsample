@@ -1,5 +1,5 @@
 import 'jest';
-import { DownsamplingFunction, DataPoint } from '../../types';
+import { DataPoint, DownsamplingFunction } from '../../types';
 import { LTD, createLTD } from '../LTD';
 import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
 import data from '../../../data/power.json';

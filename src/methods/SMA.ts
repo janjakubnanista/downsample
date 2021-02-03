@@ -1,4 +1,4 @@
-import { DownsamplingFunction, ArrayLike, SmoothingFunctionConfig, ArrayType } from '../types';
+import { ArrayLike, ArrayType, DownsamplingFunction, SmoothingFunctionConfig } from '../types';
 import { arrayAs, createLegacyDataPointConfig, emptyArray, getPointValueExtractor } from '../utils';
 
 export const SMANumeric = <T extends ArrayLike<number>>(data: T, windowSize: number, slide = 1): T => {

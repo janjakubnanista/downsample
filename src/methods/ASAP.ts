@@ -1,10 +1,4 @@
-import {
-  DownsamplingFunction,
-  ArrayLike,
-  DataPoint,
-  SmoothingFunctionConfig,
-  TypedArray,
-} from '../types';
+import { ArrayLike, DataPoint, DownsamplingFunction, SmoothingFunctionConfig, TypedArray } from '../types';
 import { SMANumeric, createSMA } from './SMA';
 import { calculateMean, calculateSTD, createLegacyDataPointConfig, emptyArray, getPointValueExtractor } from '../utils';
 import { fft, inverseFFT } from '../fft';
