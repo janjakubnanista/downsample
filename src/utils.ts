@@ -1,14 +1,4 @@
-import {
-  ArrayLike,
-  DataPoint,
-  NormalizedDataPoint,
-  NumericPropertyAccessor,
-  PointValueExtractor,
-  PossibleArray,
-  SmoothingFunctionConfig,
-  TypedArray,
-  XYDataPoint,
-} from './types';
+import { NormalizedDataPoint } from './types';
 import { isA } from 'ts-type-checked';
 
 export function calculateTriangleArea(
@@ -16,23 +6,21 @@ export function calculateTriangleArea(
   pointB: NormalizedDataPoint,
   pointC: NormalizedDataPoint,
 ): number {
-  return (
-    Math.abs((pointA[0] - pointC[0]) * (pointB[1] - pointA[1]) - (pointA[0] - pointB[0]) * (pointC[1] - pointA[1])) / 2
-  );
+  return Math.abs((pointA.x - pointC.x) * (pointB.y - pointA.y) - (pointA.x - pointB.x) * (pointC.y - pointA.y)) / 2;
 }
 
 export function calculateAverageDataPoint(...points: NormalizedDataPoint[]): NormalizedDataPoint | undefined {
   const { length } = points;
   if (!length) return undefined;
 
-  let averageX = 0;
-  let averageY = 0;
+  let x = 0;
+  let y = 0;
   for (let i = 0; i < length; i++) {
-    averageX += points[i][0];
-    averageY += points[i][1];
+    x += points[i].x;
+    y += points[i].y;
   }
 
-  return [averageX / length, averageY / length];
+  return { x: x / length, y: y / length };
 }
 
 export function splitIntoBuckets<T>(data: T[], desiredLength: number): T[][] {
