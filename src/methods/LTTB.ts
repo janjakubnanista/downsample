@@ -1,9 +1,10 @@
-import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint } from '../types';
+import { DownsamplingFunction, DownsamplingFunctionConfig, Indexable, NormalizedDataPoint } from '../types';
 import {
   calculateAverageDataPoint,
   calculateTriangleArea,
   createLegacyDataPointConfig,
   createNormalize,
+  iterableBasedOn,
   splitIntoBuckets,
 } from '../utils';
 
@@ -46,7 +47,7 @@ export function LTTBIndexesForBuckets(buckets: NormalizedDataPoint[][]): number[
 export const createLTTB = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
   const normalize = createNormalize(config.x, config.y);
 
-  return (data: P[], desiredLength: number): P[] => {
+  return <Input extends Indexable<P> = Indexable<P>>(data: Input, desiredLength: number): Input => {
     if (desiredLength < 0) {
       throw new Error(`Supplied negative desiredLength parameter to LTTB: ${desiredLength}`);
     }
@@ -57,8 +58,11 @@ export const createLTTB = <P>(config: DownsamplingFunctionConfig<P>): Downsampli
     const normalizedData: NormalizedDataPoint[] = normalize(data);
     const buckets: NormalizedDataPoint[][] = splitIntoBuckets(normalizedData, desiredLength);
     const bucketDataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
+    const output = iterableBasedOn(data, bucketDataPointIndexes.length);
 
-    return bucketDataPointIndexes.map((index) => data[index]);
+    for (let i = 0; i < bucketDataPointIndexes.length; i++) output[i] = data[bucketDataPointIndexes[i]];
+
+    return output;
   };
 };
 

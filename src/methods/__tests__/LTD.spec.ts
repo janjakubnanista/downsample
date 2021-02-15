@@ -1,7 +1,13 @@
 import 'jest';
-import { DataPoint, DownsamplingFunction } from '../../types';
+import { DownsamplingFunction } from '../../types';
 import { LTD, createLTD } from '../LTD';
-import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
+import {
+  makeTupleDateTestData,
+  makeTupleNumberTestData,
+  makeXYDateTestData,
+  makeXYNumberTestData,
+  testTypedArrays,
+} from './utils';
 import data from '../../../data/power.json';
 
 describe('LTD', () => {
@@ -11,6 +17,17 @@ describe('LTD', () => {
   describe('with TupleDataPoint with Date', () => testStuff(makeTupleDateTestData(data, MAX_DATA_LENGTH), LTD));
   describe('with XYDataPoint with number', () => testStuff(makeXYNumberTestData(data, MAX_DATA_LENGTH), LTD));
   describe('with TupleDataPoint with number', () => testStuff(makeTupleNumberTestData(data, MAX_DATA_LENGTH), LTD));
+
+  it(
+    'should return a typed array when given a typed array',
+    testTypedArrays(
+      createLTD<number>({
+        x: (point: number, index: number) => index,
+        y: (point: number) => point,
+      }),
+      5,
+    ),
+  );
 
   describe('createLTD', () => {
     describe('with string / number x / y', () => {

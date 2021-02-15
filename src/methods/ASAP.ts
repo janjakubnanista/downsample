@@ -1,6 +1,6 @@
-import { DownsamplingFunction, SmoothingFunctionConfig } from '../types';
+import { DownsamplingFunction, Indexable, SmoothingFunctionConfig } from '../types';
 import { SMANumeric, createSMA } from './SMA';
-import { calculateMean, calculateSTD, createLegacyDataPointConfig, getPointValueExtractor } from '../utils';
+import { calculateMean, calculateSTD, createLegacyDataPointConfig, getPointValueExtractor, mapToArray } from '../utils';
 import { fft, inverseFFT } from '../fft';
 
 const calculateDiffs = (values: number[]): number[] => {
@@ -145,12 +145,12 @@ const calculateAutocorrelation = (values: number[], maxLag: number): Autocorrela
   return { correlations, peaks, maxCorrelation };
 };
 
-export const createASAP = <T>(config: SmoothingFunctionConfig<T>): DownsamplingFunction<T, [number]> => {
+export const createASAP = <P>(config: SmoothingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
   const valueExtractor = getPointValueExtractor(config.y);
-  const SMA = createSMA(config);
+  const SMA = createSMA<P>(config);
 
-  return function ASAP(values, resolution): T[] {
-    if (values.length === 0) return [];
+  return function ASAP<Input extends Indexable<P> = Indexable<P>>(values: Input, resolution: number): Input {
+    if (values.length === 0) return values;
     if (resolution <= 0) {
       throw new Error(`Supplied non-positive resolution parameter to ASAP: ${resolution}`);
     }
@@ -160,11 +160,11 @@ export const createASAP = <T>(config: SmoothingFunctionConfig<T>): DownsamplingF
     if (values.length >= 2 * resolution) {
       const scale = Math.trunc(values.length / resolution);
 
-      return ASAP(SMA(values, scale, scale), resolution);
+      return ASAP<Input>(SMA(values, scale, scale) as Input, resolution);
     }
 
     // First turn data points into a sequence of values
-    const data: number[] = values.map(valueExtractor);
+    const data: number[] = mapToArray(values, valueExtractor);
 
     const { correlations, peaks, maxCorrelation } = calculateAutocorrelation(data, Math.round(data.length / 10));
     const originalKurtosis = calculateKurtosis(data);
@@ -206,7 +206,7 @@ export const createASAP = <T>(config: SmoothingFunctionConfig<T>): DownsamplingF
 
     windowSize = findWindowSize(lb, tail, data, minRoughness, originalKurtosis, windowSize);
 
-    return SMA(values, windowSize, 1);
+    return SMA(values, windowSize, 1) as Input;
   };
 };
 

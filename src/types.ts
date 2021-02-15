@@ -27,7 +27,7 @@ export type NumericPropertyNames<T> = {
 // and it would be nice to have a (generated) type for that
 export type NumericPropertyAccessor<P> = P extends unknown[] ? number : NumericPropertyNames<P>;
 
-export type PointValueExtractor<P> = (point: P) => Value;
+export type PointValueExtractor<P> = (point: P, index: number) => Value;
 
 export interface DownsamplingFunctionConfig<P> {
   x: NumericPropertyAccessor<P> | PointValueExtractor<P>;
@@ -38,4 +38,43 @@ export interface SmoothingFunctionConfig<P> extends DownsamplingFunctionConfig<P
   toPoint: (x: number, y: number, index: number) => P;
 }
 
-export type DownsamplingFunction<I, A extends unknown[], O = I> = (data: I[], ...args: A) => O[];
+export type TypedArray =
+  | Int8Array
+  | Int16Array
+  | Int32Array
+  | Uint8Array
+  | Uint8ClampedArray
+  | Uint16Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array;
+
+export type DefaultDataPoint = {
+  x: number;
+  y: number;
+};
+
+export type GetValueForIndex = (index: number) => number;
+
+export type Transformer<Params extends unknown[] = []> = (
+  length: number,
+  getX: GetValueForIndex,
+  getY: GetValueForIndex,
+  ...params: Params
+) => IterableIterator<DefaultDataPoint>;
+
+export type Indexable<T> = {
+  length: number;
+  [index: number]: T;
+};
+
+export type ArrayDownsamplingFunction<T, Params extends unknown[] = []> = (data: T[], ...params: Params) => T[];
+export type TypedArrayDownsamplingFunction<Params extends unknown[] = []> = <A extends TypedArray = TypedArray>(
+  data: A,
+  ...params: Params
+) => A;
+
+export type DownsamplingFunction<T, Params extends unknown[] = [], Input extends Indexable<T> = Indexable<T>> = (
+  data: Input,
+  ...params: Params
+) => Input;

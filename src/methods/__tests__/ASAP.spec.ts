@@ -1,7 +1,13 @@
 import 'jest';
 import { ASAP, createASAP } from '../ASAP';
 import { DownsamplingFunction } from '../../types';
-import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
+import {
+  makeTupleDateTestData,
+  makeTupleNumberTestData,
+  makeXYDateTestData,
+  makeXYNumberTestData,
+  testTypedArrays,
+} from './utils';
 import data from '../../../data/power.json';
 
 describe('ASAP', () => {
@@ -28,6 +34,18 @@ describe('ASAP', () => {
   describe('with TupleDataPoint with Date', () => testStuff(makeTupleDateTestData(data), ASAP));
   describe('with XYDataPoint with number', () => testStuff(makeXYNumberTestData(data), ASAP));
   describe('with TupleDataPoint with number', () => testStuff(makeTupleNumberTestData(data), ASAP));
+
+  it(
+    'should return a typed array when given a typed array',
+    testTypedArrays(
+      createASAP<number>({
+        x: (point: number, index: number) => index,
+        y: (point: number) => point,
+        toPoint: (x, y) => y,
+      }),
+      5,
+    ),
+  );
 
   describe('createASAP', () => {
     describe('with string / number x / y', () => {
