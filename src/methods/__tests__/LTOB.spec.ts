@@ -1,7 +1,13 @@
 import 'jest';
 import { DownsamplingFunction } from '../../types';
 import { LTOB, createLTOB } from '../LTOB';
-import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
+import {
+  makeTupleDateTestData,
+  makeTupleNumberTestData,
+  makeXYDateTestData,
+  makeXYNumberTestData,
+  testTypedArrays,
+} from './utils';
 import data from '../../../data/power.json';
 
 describe('LTOB', () => {
@@ -9,6 +15,17 @@ describe('LTOB', () => {
   describe('with TupleDataPoint with Date', () => testStuff(makeTupleDateTestData(data), LTOB));
   describe('with XYDataPoint with number', () => testStuff(makeXYNumberTestData(data), LTOB));
   describe('with TupleDataPoint with number', () => testStuff(makeTupleNumberTestData(data), LTOB));
+
+  it(
+    'should return a typed array when given a typed array',
+    testTypedArrays(
+      createLTOB<number>({
+        x: (point: number, index: number) => index,
+        y: (point: number) => point,
+      }),
+      2,
+    ),
+  );
 
   describe('createLTOB', () => {
     describe('with string / number x / y', () => {

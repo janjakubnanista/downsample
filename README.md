@@ -68,7 +68,7 @@ You can read more about the details of these in the [API](#api) section below.
 
 Automatic Smoothing for Attention Prioritization ([read more here](http://futuredata.stanford.edu/asap/)) is a smoothing rather than downsampling method - it will remove the short-term noise and reveal the large-scale deviations.
 
-`ASAP` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments. It will always return the points in `XYDataPoint` format. [See advanced API if you need to work with a custom data type](#api/createASAP).
+`ASAP` accepts an array of data points (see [DataPoint](#api/DataPoint)) or a `TypedArray` (see [TypedArray support](#api/TypedArray)) and a target resolution (number of output data points) as arguments. It will always return the points in `XYDataPoint` format. [See advanced API if you need to work with a custom data type](#api/createASAP).
 
 ```typescript
 function ASAP(data: DataPoint[], targetResolution: number): XYDataPoint[]
@@ -93,7 +93,7 @@ const smooth = ASAP([
 
 Simple moving average with variable slide ([read more here](https://en.wikipedia.org/wiki/Moving_average#Simple_moving_average)).
 
-`SMA` accepts an array of data points (see [DataPoint](#api/DataPoint)), size of a window over which to calculate average and a slide - an amount by which the window is shifted. It will always return the points in `XYDataPoint` format. [See advanced API if you need to work with a custom data type](#api/createSMA).
+`SMA` accepts an array of data points (see [DataPoint](#api/DataPoint)) or a `TypedArray` (see [TypedArray support](#api/TypedArray)), size of a window over which to calculate average and a slide - an amount by which the window is shifted. It will always return the points in `XYDataPoint` format. [See advanced API if you need to work with a custom data type](#api/createSMA).
 
 ```typescript
 function SMA(data: DataPoint[], windowSize: number, slide?: number = 1): XYDataPoint[]
@@ -122,7 +122,7 @@ Largest triangle three buckets ([read more here](https://skemman.is/bitstream/19
 function LTTB(data: DataPoint[], targetResolution: number): DataPoint[]
 ```
 
-`LTTB` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTTB).
+`LTTB` accepts an array of data points (see [DataPoint](#api/DataPoint)) or a `TypedArray` (see [TypedArray support](#api/TypedArray)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTTB).
 
 The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
 
@@ -149,7 +149,7 @@ Largest triangle one bucket ([read more here](https://skemman.is/bitstream/1946/
 function LTOB(data: DataPoint[], targetResolution: number): DataPoint[]
 ```
 
-`LTOB` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTOB).
+`LTOB` accepts an array of data points (see [DataPoint](#api/DataPoint)) or a `TypedArray` (see [TypedArray support](#api/TypedArray)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTOB).
 
 The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
 
@@ -176,7 +176,7 @@ Largest triangle dynamic ([read more here](https://skemman.is/bitstream/1946/153
 function LTD(data: DataPoint[], targetResolution: number): DataPoint[]
 ```
 
-`LTD` accepts an array of data points (see [DataPoint](#api/DataPoint)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTD).
+`LTD` accepts an array of data points (see [DataPoint](#api/DataPoint)) or a `TypedArray` (see [TypedArray support](#api/TypedArray)) and a target resolution (number of output data points) as arguments. [See advanced API if you need to work with a custom data type](#api/createLTD).
 
 The format of the data will be preserved, i.e. if passing an array of `[number, number]` data points as `data`, you will get an array of `[number, number]` on the output.
 
@@ -200,11 +200,21 @@ const downsampled = LTD([
 Represents a data point in the input data array. These formats are currently supported:
 
 ```typescript
-type DataPoint = 
-  [number, number] | 
-  [Date, number] | 
+type DataPoint =
+  [number, number] |
+  [Date, number] |
   { x: number; y: number } |
   { x: Date; y: number } |
+```
+
+<a id="api/TypedArray"></a>
+### `TypedArray` support
+
+It is now possible to pass `TypedArray` data to downsampling functions. The returned type will then match the input type, e.g. if `Int16Array` is passed in, the result will be a `Int16Array`:
+
+```typescript
+const input: Int16Array = new Int16Array(...);
+const result: Int16Array = LTD(input, 1000);
 ```
 
 ## Advanced API

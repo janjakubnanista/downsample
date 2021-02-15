@@ -1,5 +1,6 @@
 import {
   DataPoint,
+  Indexable,
   NormalizedDataPoint,
   NumericPropertyAccessor,
   PointValueExtractor,
@@ -79,6 +80,14 @@ export const calculateSTD = (values: number[]): number => {
   return Math.sqrt(std / values.length);
 };
 
+export const mapToArray = <P, R>(input: Indexable<P>, callback: (element: P, index: number) => R): R[] => {
+  const { length } = input;
+  const result = new Array(length);
+  for (let i = 0; i < length; i++) result[i] = callback(input[i], i);
+
+  return result;
+};
+
 export const getPointValueExtractor = <P>(
   accessor: NumericPropertyAccessor<P> | PointValueExtractor<P>,
 ): PointValueExtractor<P> => {
@@ -94,7 +103,8 @@ export const createNormalize = <P>(
   const getX = getPointValueExtractor(x);
   const getY = getPointValueExtractor(y);
 
-  return (data: P[]): NormalizedDataPoint[] => data.map((point) => [getX(point), getY(point)]);
+  return (data: Indexable<P>): NormalizedDataPoint[] =>
+    mapToArray(data, (point, index) => [getX(point, index), getY(point, index)]);
 };
 
 export const createXYDataPoint = (time: number, value: number): XYDataPoint => ({ x: time, y: value });
@@ -108,3 +118,6 @@ export const createLegacyDataPointConfig = (): SmoothingFunctionConfig<DataPoint
   y: (point: DataPoint) => ('y' in point ? point.y : point[1]),
   toPoint: createXYDataPoint,
 });
+
+export const iterableBasedOn = <P, Input extends Indexable<P>>(input: Input, length: number): Input =>
+  new (input.constructor as any)(length);

@@ -1,11 +1,11 @@
-import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint } from '../types';
-import { calculateTriangleArea, createLegacyDataPointConfig, createNormalize } from '../utils';
+import { DownsamplingFunction, DownsamplingFunctionConfig, Indexable, NormalizedDataPoint } from '../types';
+import { calculateTriangleArea, createLegacyDataPointConfig, createNormalize, iterableBasedOn } from '../utils';
 
 // Largest triangle three buckets data downsampling algorithm implementation
 export const createLTOB = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
   const normalize = createNormalize(config.x, config.y);
 
-  return (data: P[], desiredLength: number): P[] => {
+  return <Input extends Indexable<P> = Indexable<P>>(data: Input, desiredLength: number): Input => {
     if (desiredLength < 0) {
       throw new Error(`Supplied negative desiredLength parameter to LTOB: ${desiredLength}`);
     }
@@ -21,7 +21,11 @@ export const createLTOB = <P>(config: DownsamplingFunctionConfig<P>): Downsampli
     // - threshold is (length, Inifnity)
     const bucketSize: number = length / desiredLength;
     const normalizedData: NormalizedDataPoint[] = normalize(data);
-    const sampledData: P[] = [data[0]];
+    const outputLength = Math.max(2, desiredLength);
+    const output: Input = iterableBasedOn(data, outputLength);
+
+    output[0] = data[0];
+    output[outputLength - 1] = data[length - 1];
 
     for (let bucket = 1; bucket < desiredLength - 1; bucket++) {
       const startIndex: number = Math.floor(bucket * bucketSize);
@@ -41,12 +45,14 @@ export const createLTOB = <P>(config: DownsamplingFunctionConfig<P>): Downsampli
         }
       }
 
-      sampledData.push(data[maxAreaIndex]);
+      // sampledData.push(data[maxAreaIndex]);
+      output[bucket] = data[maxAreaIndex];
     }
 
-    sampledData.push(data[length - 1]);
+    // sampledData.push(data[length - 1]);
+    // output[desiredLength - 1] = data[length - 1];
 
-    return sampledData;
+    return output;
   };
 };
 

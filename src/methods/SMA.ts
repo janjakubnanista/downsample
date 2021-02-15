@@ -1,5 +1,5 @@
-import { DownsamplingFunction, SmoothingFunctionConfig } from '../types';
-import { createLegacyDataPointConfig, getPointValueExtractor } from '../utils';
+import { DownsamplingFunction, Indexable, SmoothingFunctionConfig } from '../types';
+import { createLegacyDataPointConfig, getPointValueExtractor, iterableBasedOn, mapToArray } from '../utils';
 
 export const SMANumeric = (data: number[], windowSize: number, slide = 1): number[] => {
   const output: number[] = [];
@@ -27,21 +27,21 @@ export const SMANumeric = (data: number[], windowSize: number, slide = 1): numbe
  * @param windowSize {Number}
  * @param slide {Number}
  */
-export const createSMA = <T>(
-  config: SmoothingFunctionConfig<T>,
-): DownsamplingFunction<T, [number, number | undefined] | [number]> => {
+export const createSMA = <P>(
+  config: SmoothingFunctionConfig<P>,
+): DownsamplingFunction<P, [number, number | undefined] | [number]> => {
   const timeExtractor = getPointValueExtractor(config.x);
   const valueExtractor = getPointValueExtractor(config.y);
   const pointFactory = config.toPoint;
 
-  return (values, windowSize, slide = 1): T[] => {
-    if (values.length === 0) return [];
-    // if (windowSize === 1 && slide === 1) return values.slice();
+  return <Input extends Indexable<P> = Indexable<P>>(values: Input, windowSize: number, slide = 1): Input => {
+    if (values.length === 0) return values;
 
-    const data: number[] = values.map(valueExtractor);
-    const times: number[] = values.map(timeExtractor);
-    const output: T[] = [];
+    const data: number[] = mapToArray(values, valueExtractor);
+    const times: number[] = mapToArray(values, timeExtractor);
+    const output: Input = iterableBasedOn(values, 0);
     let sum = 0;
+    let value: P;
 
     for (let i = 0; i < windowSize; i++) {
       sum += data[i];
@@ -49,7 +49,8 @@ export const createSMA = <T>(
 
     for (let i = windowSize; i <= data.length; i++) {
       if ((i - windowSize) % slide === 0) {
-        output.push(pointFactory((times[i - windowSize] + times[i - 1]) / 2, sum / windowSize, i - windowSize));
+        value = pointFactory((times[i - windowSize] + times[i - 1]) / 2, sum / windowSize, i - windowSize);
+        output[output.length] = value;
       }
 
       sum += data[i] - data[i - windowSize];

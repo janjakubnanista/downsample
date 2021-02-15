@@ -1,6 +1,6 @@
-import { DownsamplingFunction, DownsamplingFunctionConfig, NormalizedDataPoint, Value } from '../types';
+import { DownsamplingFunction, DownsamplingFunctionConfig, Indexable, NormalizedDataPoint, Value } from '../types';
 import { LTTBIndexesForBuckets } from './LTTB';
-import { createLegacyDataPointConfig, createNormalize, splitIntoBuckets } from '../utils';
+import { createLegacyDataPointConfig, createNormalize, iterableBasedOn, splitIntoBuckets } from '../utils';
 
 export const mergeBucketAt = (buckets: NormalizedDataPoint[][], index: number): NormalizedDataPoint[][] => {
   const bucketA: NormalizedDataPoint[] = buckets[index];
@@ -135,7 +135,7 @@ export const findHighestSSEBucketIndex = (buckets: NormalizedDataPoint[][], sse:
 export const createLTD = <P>(config: DownsamplingFunctionConfig<P>): DownsamplingFunction<P, [number]> => {
   const normalize = createNormalize(config.x, config.y);
 
-  return (data: P[], desiredLength: number): P[] => {
+  return <Input extends Indexable<P> = Indexable<P>>(data: Input, desiredLength: number): Input => {
     if (desiredLength < 0) {
       throw new Error(`Supplied negative desiredLength parameter to LTD: ${desiredLength}`);
     }
@@ -211,9 +211,13 @@ export const createLTD = <P>(config: DownsamplingFunctionConfig<P>): Downsamplin
     }
 
     const dataPointIndexes: number[] = LTTBIndexesForBuckets(buckets);
-    const dataPoints: P[] = dataPointIndexes.map<P>((index: number) => data[index]);
+    const outputLength = dataPointIndexes.length;
+    const output: Input = iterableBasedOn(data, outputLength);
+    for (let i = 0; i < outputLength; i++) {
+      output[i] = data[dataPointIndexes[i]];
+    }
 
-    return dataPoints;
+    return output;
   };
 };
 

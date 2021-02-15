@@ -1,6 +1,12 @@
 import { DataPoint, DownsamplingFunction } from '../../types';
 import { SMA, SMANumeric, createSMA } from '../SMA';
-import { makeTupleDateTestData, makeTupleNumberTestData, makeXYDateTestData, makeXYNumberTestData } from './utils';
+import {
+  makeTupleDateTestData,
+  makeTupleNumberTestData,
+  makeXYDateTestData,
+  makeXYNumberTestData,
+  testTypedArrays,
+} from './utils';
 import data from '../../../data/power.json';
 
 describe('SMANumeric', () => {
@@ -59,6 +65,19 @@ describe('SMA', () => {
   describe('with TupleDataPoint with Date', () => testStuff(makeTupleDateTestData(data), SMA));
   describe('with XYDataPoint with number', () => testStuff(makeXYNumberTestData(data), SMA));
   describe('with TupleDataPoint with number', () => testStuff(makeTupleNumberTestData(data), SMA));
+
+  it(
+    'should return a typed array when given a typed array',
+    testTypedArrays(
+      createSMA<number>({
+        x: (point: number, index: number) => index,
+        y: (point: number) => point,
+        toPoint: (x, y) => y,
+      }),
+      5,
+      2,
+    ),
+  );
 
   describe('createSMA', () => {
     describe('with string / number x / y', () => {

@@ -21,3 +21,7 @@
 - Added missing `SMA` export
 - Added downampling function factories (`createASAP`, `createLTD` etc.)
 - Fixed a typo in API docs
+
+## 1.4.0
+
+- Added support for `TypedArray` types (`Int8Array`, `Int16Array`, `Int32Array`, `Uint8Array`, `Uint8ClampedArray`, `Uint16Array`, `Uint32Array`, `Float32Array`, `Float64Array`)
