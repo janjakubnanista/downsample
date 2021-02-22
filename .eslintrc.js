@@ -40,8 +40,6 @@ module.exports = {
     },
   ],
   rules: {
-    // Place to put our Quin-specific rules
-
     // Prevent forgotten console.* statements
     'no-console': 2,
 

@@ -9,7 +9,8 @@
     "build:watch": "rollup -cw",
     "clean": "rm -rf dist",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "yarn lint --fix",
+    "lint:dist": "eslint dist --ext .d.ts --fix",
+    "lint:fix": "npm run lint --fix",
     "release": "./scripts/release.sh",
     "test": "jest",
     "test:watch": "jest --watch"

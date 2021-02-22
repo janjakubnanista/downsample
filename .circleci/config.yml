@@ -37,12 +37,16 @@ jobs:
           command: npm install
 
       - run:
+          name: Lint
+          command: npm run lint
+
+      - run:
           name: Build
           command: npm run build
 
       - run:
           name: Lint
-          command: npm run lint
+          command: npm run lint:dist
 
       - persist_to_workspace:
           root: ~/project
