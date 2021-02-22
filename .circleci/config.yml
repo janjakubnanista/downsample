@@ -89,6 +89,12 @@ jobs:
       - attach_workspace:
           at: ~/project
 
+      # Restore NPM modules from cache
+      - restore_cache:
+          keys:
+            - v1-root-{{ checksum "package-lock.json" }}
+            - v1-root
+
       - run:
           name: Authenticate for NPM
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > dist/.npmrc

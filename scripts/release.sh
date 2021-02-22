@@ -4,7 +4,7 @@ DRY_RUN=
 QUIET=
 
 # Get the script arguments
-# 
+#
 # -d|--dry-run        Don't publish, just peek
 # -q|--quiet          Suppress user confirmation of publish (has no effect when dry-running)
 while [[ $# -gt 0 ]]; do
@@ -30,8 +30,6 @@ TEST_PATH="$ROOT_PATH/test"
 
 set -e
 set -x
-
-$SCRIPTS_PATH/build.sh
 
 # Link the release
 cd "$DIST_PATH"
