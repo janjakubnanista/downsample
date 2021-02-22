@@ -29,7 +29,7 @@ jobs:
       # Restore NPM modules from cache
       - restore_cache:
           keys:
-            - v1-root-{{ checksum "package-lock.lock" }}
+            - v1-root-{{ checksum "package-lock.json" }}
             - v1-root
 
       - run:
@@ -55,7 +55,7 @@ jobs:
 
       # Restore NPM modules from cache
       - save_cache:
-          key: v1-root-{{ checksum "package-lock.lock" }}
+          key: v1-root-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
 
@@ -72,7 +72,7 @@ jobs:
       # Restore NPM modules from cache
       - restore_cache:
           keys:
-            - v1-root-{{ checksum "package-lock.lock" }}
+            - v1-root-{{ checksum "package-lock.json" }}
             - v1-root
 
       - run:
@@ -95,7 +95,7 @@ jobs:
 
       - run:
           name: Publish package
-          command: make publish
+          command: npm run release
 
 workflows:
   test:
