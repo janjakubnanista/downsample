@@ -1,0 +1,114 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@3.0.0
+
+# Job defaults
+defaults: &defaults
+  working_directory: ~/project
+  executor:
+      name: node/default
+
+# Filters for jobs that only need to be run for a version tag (release)
+only-release: &only-release
+  filters:
+    # Ignore all branches
+    branches:
+      ignore: /.*/
+    # And only run on version tags
+    tags:
+      only: /^v(\d+)\.(\d+)\.(\d+).*/
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      # Checkout the project
+      - checkout
+
+      # Restore NPM modules from cache
+      - restore_cache:
+          keys:
+            - v1-root-{{ checksum "yarn.lock" }}
+            - v1-root
+
+      - run:
+          name: Install dependencies
+          command: npm install
+
+      - run:
+          name: Build
+          command: npm run build
+
+      - run:
+          name: Lint
+          command: npm run lint
+
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - dist
+
+      # Restore NPM modules from cache
+      - save_cache:
+          key: v1-root-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+
+  test:
+    <<: *defaults
+    steps:
+      # Checkout the project
+      - checkout
+
+      # Get the build artifacts
+      - attach_workspace:
+          at: ~/project
+
+      - run:
+          name: Unit test
+          command: npm test
+
+  publish:
+    <<: *defaults
+    steps:
+      # Checkout the project
+      - checkout
+
+      # Get the build artifacts
+      - attach_workspace:
+          at: ~/project
+
+      - run:
+          name: Authenticate for NPM
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > dist/.npmrc
+
+      - run:
+          name: Publish package
+          command: make publish
+
+workflows:
+  test:
+    jobs:
+      - build
+      - test:
+          requires:
+              - build
+
+  release:
+    jobs:
+      - kickoff:
+          type: approval
+
+      - build:
+          requires:
+            - kickoff
+
+      - kickoff:
+          type: approval
+          requires:
+            - build
+
+      - publish:
+          requires:
+              - approve
