@@ -104,7 +104,7 @@ workflows:
           requires:
             - kickoff
 
-      - kickoff:
+      - approve:
           type: approval
           requires:
             - build
