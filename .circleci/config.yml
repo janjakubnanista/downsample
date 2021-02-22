@@ -29,7 +29,7 @@ jobs:
       # Restore NPM modules from cache
       - restore_cache:
           keys:
-            - v1-root-{{ checksum "yarn.lock" }}
+            - v1-root-{{ checksum "package-lock.lock" }}
             - v1-root
 
       - run:
@@ -55,7 +55,7 @@ jobs:
 
       # Restore NPM modules from cache
       - save_cache:
-          key: v1-root-{{ checksum "yarn.lock" }}
+          key: v1-root-{{ checksum "package-lock.lock" }}
           paths:
             - node_modules
 
@@ -68,6 +68,12 @@ jobs:
       # Get the build artifacts
       - attach_workspace:
           at: ~/project
+
+      # Restore NPM modules from cache
+      - restore_cache:
+          keys:
+            - v1-root-{{ checksum "package-lock.lock" }}
+            - v1-root
 
       - run:
           name: Unit test
