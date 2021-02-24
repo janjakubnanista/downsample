@@ -20,7 +20,7 @@ only-release: &only-release
       only: /^v(\d+)\.(\d+)\.(\d+).*/
 
 jobs:
-  build:
+  build-and-test:
     <<: *defaults
     steps:
       # Checkout the project
@@ -37,16 +37,8 @@ jobs:
           command: npm install
 
       - run:
-          name: Lint
-          command: npm run lint
-
-      - run:
-          name: Build
-          command: npm run build
-
-      - run:
-          name: Lint
-          command: npm run lint:dist
+          name: Build and test
+          command: ./scripts/build.sh
 
       - persist_to_workspace:
           root: ~/project
@@ -58,26 +50,6 @@ jobs:
           key: v1-root-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
-
-  test:
-    <<: *defaults
-    steps:
-      # Checkout the project
-      - checkout
-
-      # Get the build artifacts
-      - attach_workspace:
-          at: ~/project
-
-      # Restore NPM modules from cache
-      - restore_cache:
-          keys:
-            - v1-root-{{ checksum "package-lock.json" }}
-            - v1-root
-
-      - run:
-          name: Unit test
-          command: npm test
 
   publish:
     <<: *defaults
@@ -106,24 +78,21 @@ jobs:
 workflows:
   test:
     jobs:
-      - build
-      - test:
-          requires:
-              - build
+      - build-and-test
 
   release:
     jobs:
       - kickoff:
           type: approval
 
-      - build:
+      - build-and-test:
           requires:
             - kickoff
 
       - approve:
           type: approval
           requires:
-            - build
+            - build-and-test
 
       - publish:
           requires:

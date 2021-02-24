@@ -33,14 +33,14 @@ set -x
 
 # Link the release
 cd "$DIST_PATH"
-yarn link
+npm link
 
 # Test the release
 cd ../
 cd "$TEST_PATH"
-yarn link downsample
-yarn
-yarn test
+npm link downsample
+npm install
+npm test
 
 cd ../
 cd "$DIST_PATH"

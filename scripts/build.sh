@@ -10,17 +10,17 @@ set -e
 set -x
 
 # Clean the build folder
-yarn clean
+npm run clean
 
 # Make sure everything is okay
-yarn lint
-yarn test
+npm run lint
+npm test
 
 # Build the package
-yarn build
+npm run build
 
 # Lint the build
-yarn lint:fix
+npm run lint:dist
 
 # Copy all the metadata files to dist
 cp LICENSE "$DIST_PATH/LICENSE"
